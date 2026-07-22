@@ -12,9 +12,9 @@
  * this job in phase 1.
  */
 import { createServer } from 'node:http';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, realpath, stat } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { baueTextfassung } from './textfassung.ts';
 import type { Katalog } from './katalog-typen.ts';
@@ -42,9 +42,34 @@ const VIEWER_WURZEL = resolve(import.meta.dirname, '..');
  */
 const ENGINE_WURZEL = resolve(VIEWER_WURZEL, '..', 'flip-engine');
 
-/** Blocks `../` traversal: the resolved path must stay inside the root. */
-function sichererPfad(wurzel: string, angefragt: string): string | undefined {
-  const ziel = resolve(join(wurzel, normalize(decodeURIComponent(angefragt))));
+/**
+ * Resolves a request path inside a root directory, or rejects it.
+ *
+ * Fails closed at every step rather than repairing the input. The previous
+ * version normalised first, which silently rewrote `/../../package.json` into
+ * a valid in-root path instead of refusing it — the request never escaped, but
+ * an attack that gets answered with 200 teaches you nothing.
+ *
+ * Symlink resolution happens in `sendeDatei`: a link inside the root pointing
+ * outside would pass a purely textual check.
+ */
+export function sichererPfad(wurzel: string, angefragt: string): string | undefined {
+  let dekodiert: string;
+  try {
+    dekodiert = decodeURIComponent(angefragt);
+  } catch {
+    return undefined; // kaputte Prozentkodierung
+  }
+
+  // NUL-Bytes können Pfadprüfungen in darunterliegenden Schichten aushebeln.
+  if (dekodiert.includes('\0')) return undefined;
+
+  const segmente = dekodiert.split('/').filter((s) => s.length > 0 && s !== '.');
+
+  // Kein Segment darf aufwärts zeigen — auch nicht nach dem Dekodieren.
+  if (segmente.includes('..')) return undefined;
+
+  const ziel = resolve(wurzel, ...segmente);
   return ziel === wurzel || ziel.startsWith(wurzel + '/') ? ziel : undefined;
 }
 
@@ -95,18 +120,18 @@ export async function starte(port: number, katalogVerzeichnis: string): Promise<
         if (pfad.startsWith('/katalog/')) {
           const ziel = sichererPfad(katalogVerzeichnis, pfad.slice('/katalog/'.length));
           if (!ziel) return sende(antwort, 403, 'text/plain', 'Verboten');
-          return await sendeDatei(antwort, ziel);
+          return await sendeDatei(antwort, ziel, katalogVerzeichnis);
         }
 
         if (pfad.startsWith('/flip-engine/')) {
           const ziel = sichererPfad(ENGINE_WURZEL, pfad.slice('/flip-engine/'.length));
           if (!ziel) return sende(antwort, 403, 'text/plain', 'Verboten');
-          return await sendeDatei(antwort, ziel);
+          return await sendeDatei(antwort, ziel, ENGINE_WURZEL);
         }
 
         const ziel = sichererPfad(VIEWER_WURZEL, pfad);
         if (!ziel) return sende(antwort, 403, 'text/plain', 'Verboten');
-        return await sendeDatei(antwort, ziel);
+        return await sendeDatei(antwort, ziel, VIEWER_WURZEL);
       } catch {
         sende(antwort, 404, 'text/plain', `Nicht gefunden: ${pfad}`);
       }
@@ -139,20 +164,31 @@ function sende(
 async function sendeDatei(
   antwort: import('node:http').ServerResponse,
   pfad: string,
+  wurzel: string,
 ): Promise<void> {
-  const info = await stat(pfad);
+  // Zweite Absicherung, diesmal gegen das Dateisystem statt gegen die
+  // Zeichenkette: Ein Symlink innerhalb der Wurzel, der nach außen zeigt,
+  // besteht jede rein textuelle Prüfung.
+  const echterPfad = await realpath(pfad);
+  if (echterPfad !== wurzel && !echterPfad.startsWith(wurzel + '/')) {
+    throw new Error('Ziel liegt außerhalb des erlaubten Verzeichnisses');
+  }
+
+  const info = await stat(echterPfad);
   if (!info.isFile()) throw new Error('kein File');
 
-  const endung = extname(pfad);
+  const endung = extname(echterPfad);
   const typ = MIME[endung] ?? 'application/octet-stream';
 
+  // Ab hier nur noch der geprüfte Pfad — sonst wäre die Symlink-Prüfung
+  // umsonst gewesen.
   // TypeScript wird zu JavaScript, damit der Browser es direkt laden kann.
   if (endung === '.ts') {
-    const quelle = await readFile(pfad, 'utf8');
+    const quelle = await readFile(echterPfad, 'utf8');
     return sende(antwort, 200, typ, stripTypeScriptTypes(quelle, { mode: 'strip' }));
   }
 
-  return sende(antwort, 200, typ, await readFile(pfad));
+  return sende(antwort, 200, typ, await readFile(echterPfad));
 }
 
 if (import.meta.filename === process.argv[1]) {
