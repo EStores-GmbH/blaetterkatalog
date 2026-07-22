@@ -44,6 +44,14 @@ export interface Katalog {
    */
   ausrichtung: Ausrichtung;
   akzentfarbe: string;
+  /**
+   * Backdrop the book sits on. Either a preset name the viewer knows
+   * ("holz", "holz-dunkel", "grau", "dunkel") or a plain hex colour.
+   *
+   * The generator only stores the value — which presets exist is the viewer's
+   * business, and in phase 1 an editor picks it in Storyblok.
+   */
+  hintergrund: string;
   download_pdf: string;
   seiten: Seite[];
   toc: TocEintrag[];

@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { leseArgumente } from '../src/cli.ts';
+import { HINTERGRUND_VORLAGEN, leseArgumente } from '../src/cli.ts';
 import { STANDARD_DPI } from '../src/render.ts';
 import { WerkzeugFehlt } from '../src/pdf-tools.ts';
 
@@ -55,5 +55,31 @@ describe('WerkzeugFehlt', () => {
     assert.match(fehler.message, /pdfinfo/);
     assert.match(fehler.message, /pdftotext/);
     assert.deepEqual(fehler.fehlend, ['pdfinfo', 'pdftotext']);
+  });
+});
+
+describe('leseArgumente — Hintergrund', () => {
+  test('nimmt Holz als Voreinstellung', () => {
+    const o = leseArgumente(['k.pdf']);
+    if (o === 'hilfe') throw new Error('unerwartet Hilfe');
+    assert.equal(o.hintergrund, 'holz');
+  });
+
+  test('akzeptiert alle Vorlagen', () => {
+    for (const vorlage of HINTERGRUND_VORLAGEN) {
+      const o = leseArgumente(['k.pdf', '--hintergrund', vorlage]);
+      if (o === 'hilfe') throw new Error('unerwartet Hilfe');
+      assert.equal(o.hintergrund, vorlage);
+    }
+  });
+
+  test('akzeptiert einen freien Hex-Wert', () => {
+    const o = leseArgumente(['k.pdf', '--hintergrund', '#3b2a1a']);
+    if (o === 'hilfe') throw new Error('unerwartet Hilfe');
+    assert.equal(o.hintergrund, '#3b2a1a');
+  });
+
+  test('weist Tippfehler zurück, statt sie stillschweigend zu schlucken', () => {
+    assert.throws(() => leseArgumente(['k.pdf', '--hintergrund', 'holtz']), /Vorlage/);
   });
 });

@@ -27,6 +27,8 @@ export interface Katalog {
   seitenzahl: number;
   ausrichtung: Ausrichtung;
   akzentfarbe: string;
+  /** Preset name or hex colour. Optional — ältere Kataloge kennen das Feld nicht. */
+  hintergrund?: string;
   download_pdf: string;
   seiten: Seite[];
   toc: TocEintrag[];

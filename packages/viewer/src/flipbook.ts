@@ -9,6 +9,7 @@
  * See packages/flip-engine/HERKUNFT.md, PATCH 3.
  */
 import { ladeEngine } from './engine.ts';
+import { waehleHintergrund } from './hintergrund.ts';
 import type { Katalog } from './katalog-typen.ts';
 import { baueAltText } from './textfassung.ts';
 
@@ -17,10 +18,22 @@ const VORLADEFENSTER = 2;
 
 interface Elemente {
   katalog: HTMLElement;
+  buehne: HTMLElement;
   titel: HTMLElement;
   seitenstand: HTMLElement;
   ansage: HTMLElement;
   download: HTMLAnchorElement;
+}
+
+/** Applies the backdrop decision to the stage element. */
+function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined): string {
+  const wahl = waehleHintergrund(wunsch);
+  buehne.dataset['hintergrund'] = wahl.kennung;
+
+  if (wahl.farbe) buehne.style.background = wahl.farbe;
+  else buehne.style.removeProperty('background');
+
+  return wahl.kennung;
 }
 
 function hole<T extends HTMLElement>(id: string): T {
@@ -81,8 +94,12 @@ function beschreibeStand(seite: number, gesamt: number, doppelseite: boolean): s
 }
 
 async function start(): Promise<void> {
+  const buehne = document.querySelector<HTMLElement>('.buehne');
+  if (!buehne) throw new Error('Die Bühne fehlt im HTML');
+
   const el: Elemente = {
     katalog: hole('katalog'),
+    buehne,
     titel: hole('katalog-titel'),
     seitenstand: hole('seitenstand'),
     ansage: hole('ansage'),
@@ -97,6 +114,7 @@ async function start(): Promise<void> {
   el.titel.textContent = katalog.titel;
   el.download.href = `/katalog/${katalog.download_pdf}`;
   document.documentElement.style.setProperty('--akzent', katalog.akzentfarbe);
+  setzeHintergrund(el.buehne, katalog.hintergrund);
 
   const erste = katalog.seiten[0];
   if (!erste) throw new Error('Der Katalog enthält keine Seiten.');

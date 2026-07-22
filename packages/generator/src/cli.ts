@@ -27,6 +27,8 @@ Optionen
   --slug <text>    Kurzname für die URL     (Standard: aus dem Dateinamen)
   --titel <text>   Anzeigetitel             (Standard: aus den PDF-Metadaten)
   --farbe <hex>    Akzentfarbe              (Standard: #0057a0)
+  --hintergrund    Untergrund des Katalogs  (Standard: holz)
+                   holz · holz-dunkel · grau · dunkel · oder ein Hex-Wert
   --hilfe          Diese Übersicht
 
 Beispiel
@@ -40,7 +42,16 @@ interface Optionen {
   slug: string | undefined;
   titel: string | undefined;
   farbe: string;
+  hintergrund: string;
 }
+
+/**
+ * Backdrops the viewer ships with. Kept here only to reject typos early — the
+ * generator stores the string, the viewer decides what it looks like.
+ */
+export const HINTERGRUND_VORLAGEN = ['holz', 'holz-dunkel', 'grau', 'dunkel'] as const;
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
 
 export function leseArgumente(argv: string[]): Optionen | 'hilfe' {
   const { values, positionals } = parseArgs({
@@ -52,6 +63,7 @@ export function leseArgumente(argv: string[]): Optionen | 'hilfe' {
       slug: { type: 'string' },
       titel: { type: 'string' },
       farbe: { type: 'string' },
+      hintergrund: { type: 'string' },
       hilfe: { type: 'boolean', default: false },
     },
   });
@@ -67,11 +79,28 @@ export function leseArgumente(argv: string[]): Optionen | 'hilfe' {
   }
 
   const farbe = values.farbe ?? '#0057a0';
-  if (!/^#[0-9a-fA-F]{6}$/.test(farbe)) {
+  if (!HEX.test(farbe)) {
     throw new Error(`--farbe muss ein Hex-Wert wie #0057a0 sein, war "${farbe}"`);
   }
 
-  return { pdf, out: values.out, dpi, slug: values.slug, titel: values.titel, farbe };
+  const hintergrund = values.hintergrund ?? 'holz';
+  const istVorlage = (HINTERGRUND_VORLAGEN as readonly string[]).includes(hintergrund);
+  if (!istVorlage && !HEX.test(hintergrund)) {
+    throw new Error(
+      `--hintergrund muss eine Vorlage (${HINTERGRUND_VORLAGEN.join(', ')}) ` +
+        `oder ein Hex-Wert wie #3b2a1a sein, war "${hintergrund}"`,
+    );
+  }
+
+  return {
+    pdf,
+    out: values.out,
+    dpi,
+    slug: values.slug,
+    titel: values.titel,
+    farbe,
+    hintergrund,
+  };
 }
 
 async function main(): Promise<void> {
@@ -163,6 +192,7 @@ async function main(): Promise<void> {
     seitenzahl: info.seitenzahl,
     ausrichtung: bilder.ausrichtung,
     akzentfarbe: optionen.farbe,
+    hintergrund: optionen.hintergrund,
     download_pdf: basename(pdfPfad),
     seiten,
     toc,
