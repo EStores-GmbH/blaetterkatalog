@@ -29,5 +29,8 @@
   // Der einvendorte StPageFlip-Fork hat seine eigene Konfiguration — er wurde
   // ohne Strict-Modus geschrieben und braucht die DOM-Typen.
   // Geprüft wird er trotzdem: `npm run type-check` ruft beide Konfigurationen auf.
-  "exclude": ["packages/flip-engine/**", "node_modules", "out"]
+  // Beide Pakete bringen eigene Konfigurationen mit: flip-engine läuft ohne
+  // Strict-Modus, der Viewer braucht zusätzlich die Browser-Typen.
+  // `npm run type-check` prüft alle drei.
+  "exclude": ["packages/flip-engine/**", "packages/viewer/**", "node_modules", "out"]
 }

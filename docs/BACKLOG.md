@@ -23,17 +23,13 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 
 ## Aktueller Sprint — Phase 0 (Prototyp, ohne Storyblok)
 
-- [ ] T-011  Tastatur- und ARIA-Ebene (←/→/Pos1/Ende, `role`, `aria-live`, Fokusring)  (Prio: hoch · abhängig von: T-012)
-      **Umgezogen: gehört in den Viewer, nicht in den Fork.** Im HTML-Modus liefern wir die
-      Seitenelemente selbst — Beschriftung und Fokus gehören ohnehin in unseren Code, und
-      jede nicht geänderte Zeile Fremdcode erleichtert den späteren Abgleich.
-- [ ] T-012  Standalone-Viewer im HTML-Modus, liest `katalog.json`  (Prio: hoch · abhängig von: T-007, T-009)
-- [ ] T-013  Doppelseite Desktop / Einzelseite mobil, Nachladefenster ±2 Seiten  (Prio: hoch · abhängig von: T-012)
-      Doppelseite NUR bei Hochformat. Querformat/16:9 immer einzeln — zwei 16:9-Seiten
-      nebeneinander ergäben 32:9. Seitenverhältnis kommt aus `katalog.json`, nichts fest
-      verdrahten. Siehe docs/ARCHITECTURE.md, Abschnitt „Seitenformate".
 - [ ] T-014  Messpunkt echte Hardware: 150-Seiten-Katalog auf iPhone + Mid-Range-Android  (Prio: hoch · abhängig von: T-013)
       Misst Speicher, Wischqualität, Ladezeit. Ergebnis entscheidet, ob der Fork so bleibt.
+      Der vorliegende Katalog hat nur 46 Seiten — für den Belastungstest brauchen wir einen
+      größeren oder einen künstlich verlängerten.
+- [ ] T-033  Querformat-Katalog gegenprüfen  (Prio: mittel)
+      Die Einzelseiten-Regel für Querformat ist umgesetzt, aber nur mit Hochformat getestet.
+      Sobald ein 16:9-PDF vorliegt: prüfen, dass der Viewer nicht auf Doppelseite schaltet.
 
 ## Nächster Sprint — Phase 1 (Kernfunktionen + Storyblok)
 
@@ -108,3 +104,15 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
       `destroy()` hielt die Schleife nie an. Mit Browser-Attrappe nachgewiesen,
       dass sie sich nach `stop()` nicht neu einplant.
 - [x] T-010  Patch 2 — Bild-Fehlerbehandlung gegen Endlos-Ladekringel  (2026-07-22)
+- [x] T-011  Tastatur- und ARIA-Ebene — im Viewer statt im Fork  (2026-07-22)
+      ←/→/↑/↓/Bild-auf/Bild-ab/Pos1/Ende, Fokus auf dem Katalog, `aria-live`-Ansage
+      der Seitenzahl, Link zur Textfassung als erster Tabstopp, kein `user-scalable=no`.
+      Im Browser durchgeprüft: Pos1 und Ende springen korrekt, die Ansage folgt.
+- [x] T-012  Standalone-Viewer im HTML-Modus, liest `katalog.json`  (2026-07-22)
+      Dazu ein Entwicklungsserver ohne Fremdpakete, der TypeScript im laufenden
+      Betrieb für den Browser übersetzt. `npm run viewer`.
+      Zusätzlich entstanden: die HTML-Textfassung unter `/text/` — 33.000 Zeichen
+      Katalogtext im Quelltext, 46 Bilder mit Alt-Text, Inhaltsverzeichnis mit Sprungmarken.
+- [x] T-013  Doppelseite Desktop / Einzelseite mobil, Nachladefenster ±2 Seiten  (2026-07-22)
+      Im Browser gemessen: nach dem Durchblättern waren 10 von 46 Bildern geladen,
+      36 warteten noch. Beim Öffnen also unter 1 MB statt 13 MB.

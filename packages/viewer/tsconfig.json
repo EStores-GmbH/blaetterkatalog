@@ -1,0 +1,14 @@
+{
+  // Der Viewer läuft im Browser (und der Entwicklungsserver in Node), braucht
+  // also beide Typwelten. Ansonsten gelten dieselben strengen Regeln wie im
+  // übrigen eigenen Code — der einvendorte Fremdcode bleibt draußen, weil
+  // src/engine.ts ihn über einen zur Laufzeit gebauten Pfad lädt.
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  // Muss überschrieben werden: die geerbte Liste schließt genau dieses Paket aus.
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

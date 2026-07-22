@@ -1,0 +1,154 @@
+/* Textfassung — die barrierefreie Alternativfassung.
+   Auf Lesbarkeit ausgelegt: begrenzte Zeilenlänge, klare Struktur,
+   Kontraste deutlich über der Anforderung. */
+
+:root {
+  --akzent: #0057a0;
+  --text: #1a1a1a;
+  --gedaempft: #595959;
+  --rand: #d4d4d4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0 1rem 4rem;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: #fff;
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 3px solid var(--akzent);
+  outline-offset: 2px;
+}
+
+.skiplink {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  padding: 0.75rem 1rem;
+  background: var(--akzent);
+  color: #fff;
+  transition: top 0.15s ease;
+}
+
+.skiplink:focus {
+  top: 0;
+}
+
+header,
+main,
+footer {
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+header {
+  padding: 2rem 0 1rem;
+  border-bottom: 2px solid var(--akzent);
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+}
+
+.hinweis {
+  margin: 0;
+  color: var(--gedaempft);
+}
+
+.hinweis a,
+.toc a {
+  color: var(--akzent);
+}
+
+.toc {
+  margin: 2rem 0 3rem;
+  padding: 1.25rem 1.5rem;
+  background: #f7f7f7;
+  border-radius: 6px;
+}
+
+.toc h2 {
+  margin-top: 0;
+}
+
+.toc ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.toc li {
+  margin-bottom: 0.4rem;
+}
+
+.toc .seitenzahl {
+  color: var(--gedaempft);
+  font-size: 0.9rem;
+}
+
+.seite {
+  padding: 2rem 0;
+  border-top: 1px solid var(--rand);
+}
+
+.seite h2 {
+  font-size: 1.1rem;
+  color: var(--gedaempft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.seite-inhalt {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+}
+
+/* Zeilenlänge begrenzen — lange Zeilen sind für Menschen mit Leseschwäche
+   besonders schwer zu verfolgen (WCAG 1.4.8, hier freiwillig). */
+.seite-text {
+  max-width: 42em;
+}
+
+.seite-text p {
+  margin: 0 0 1rem;
+}
+
+.seite-text .ohne-text {
+  color: var(--gedaempft);
+  font-style: italic;
+}
+
+.seite-inhalt img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rand);
+  border-radius: 4px;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rand);
+  color: var(--gedaempft);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .seite-inhalt {
+    grid-template-columns: 1fr;
+  }
+
+  /* Auf schmalen Geräten steht der Text zuerst — er ist der eigentliche Inhalt. */
+  .seite-inhalt img {
+    order: 2;
+  }
+}

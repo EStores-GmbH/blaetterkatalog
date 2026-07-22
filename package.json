@@ -19,7 +19,8 @@
     "katalog-build": "node --experimental-strip-types packages/generator/src/cli.ts",
     "test": "node --experimental-strip-types --test packages/*/test/*.test.ts",
     "test:coverage": "node --experimental-strip-types --experimental-test-coverage --test packages/*/test/*.test.ts",
-    "type-check": "tsc --noEmit && tsc --noEmit -p packages/flip-engine"
+    "viewer": "node --experimental-strip-types packages/viewer/src/dev-server.ts",
+    "type-check": "tsc --noEmit && tsc --noEmit -p packages/flip-engine && tsc --noEmit -p packages/viewer"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

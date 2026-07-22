@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <!-- Bewusst OHNE user-scalable=no. Der Referenz-Katalog verbietet das Zoomen
+       per Fingergeste und verstößt damit gegen WCAG 1.4.4 — genau der Fehler,
+       den wir nicht übernehmen. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blätterkatalog</title>
+  <link rel="stylesheet" href="/src/flipbook.css">
+  <link rel="stylesheet" href="/flip-engine/src/Style/stPageFlip.css">
+</head>
+<body>
+  <!-- Erster fokussierbarer Inhalt: der Weg zur barrierefreien Fassung.
+       WCAG verlangt für eine gleichwertige Alternativversion, dass sie über
+       einen zugänglichen Mechanismus erreichbar ist — nicht versteckt. -->
+  <a class="skiplink" href="/text/">Katalog als Textfassung öffnen</a>
+
+  <header class="kopf">
+    <h1 id="katalog-titel">Katalog wird geladen …</h1>
+  </header>
+
+  <main>
+    <div class="buehne">
+      <button type="button" class="blaettern zurueck" data-richtung="zurueck" aria-label="Vorherige Seite">
+        <span aria-hidden="true">‹</span>
+      </button>
+
+      <!-- Die Engine schreibt hier hinein. <section> mit Beschriftung ergibt
+           einen Bereich, den Screenreader anspringen können. Das tabindex ist
+           Absicht: Der Katalog muss selbst den Fokus bekommen können, damit die
+           Pfeiltasten wirken, ohne vorher einen Knopf anzuklicken. -->
+      <section
+        id="katalog"
+        class="katalog"
+        tabindex="0"
+        aria-label="Katalogseiten"
+        aria-roledescription="Blätterkatalog"
+        aria-describedby="bedienhinweis"></section>
+
+      <button type="button" class="blaettern vor" data-richtung="vor" aria-label="Nächste Seite">
+        <span aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <p id="bedienhinweis" class="bedienhinweis">
+      Mit den Pfeiltasten blättern, Pos1 und Ende springen zum Anfang und Ende.
+    </p>
+
+    <div class="leiste">
+      <p class="seitenstand" id="seitenstand">–</p>
+      <p class="verweise">
+        <a href="/text/">Textfassung</a>
+        <a id="download" href="#" download>PDF herunterladen</a>
+      </p>
+    </div>
+
+    <!-- Seitenwechsel werden hier angesagt. polite, damit die Ansage den
+         Nutzer nicht beim Lesen unterbricht. -->
+    <p class="nur-screenreader" aria-live="polite" id="ansage"></p>
+  </main>
+
+  <noscript>
+    <p class="hinweis-noscript">
+      Der Blätterkatalog braucht JavaScript.
+      <a href="/text/">Die Textfassung funktioniert auch ohne.</a>
+    </p>
+  </noscript>
+
+  <script type="module" src="/src/flipbook.ts"></script>
+</body>
+</html>
