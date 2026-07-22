@@ -9,7 +9,7 @@
  * See packages/flip-engine/HERKUNFT.md, PATCH 3.
  */
 import { ladeEngine } from './engine.ts';
-import { waehleHintergrund } from './hintergrund.ts';
+import { HINTERGRUND_NOTNAGEL, bildDarstellung, waehleHintergrund } from './hintergrund.ts';
 import type { Katalog } from './katalog-typen.ts';
 import { baueAltText } from './textfassung.ts';
 
@@ -25,15 +25,58 @@ interface Elemente {
   download: HTMLAnchorElement;
 }
 
-/** Applies the backdrop decision to the stage element. */
-function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined): string {
+/**
+ * Applies the backdrop.
+ *
+ * The image is loaded before it is applied. A missing or broken file therefore
+ * leaves the drawn wood in place instead of a blank stage — and says so in the
+ * console rather than failing silently.
+ */
+async function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined): Promise<void> {
   const wahl = waehleHintergrund(wunsch);
-  buehne.dataset['hintergrund'] = wahl.kennung;
 
-  if (wahl.farbe) buehne.style.background = wahl.farbe;
-  else buehne.style.removeProperty('background');
+  buehne.style.removeProperty('background-color');
+  buehne.style.removeProperty('background-image');
 
-  return wahl.kennung;
+  if (wahl.art === 'farbe' && wahl.farbe) {
+    buehne.dataset['hintergrund'] = wahl.kennung;
+    buehne.style.backgroundColor = wahl.farbe;
+    return;
+  }
+
+  if (wahl.art !== 'bild' || !wahl.bild) {
+    buehne.dataset['hintergrund'] = wahl.kennung;
+    return;
+  }
+
+  // Bis das Bild da ist, steht das gezeichnete Holz — so bleibt die Bühne nie leer.
+  buehne.dataset['hintergrund'] = HINTERGRUND_NOTNAGEL;
+
+  const bild = await ladeBild(wahl.bild);
+  if (!bild) {
+    console.warn(
+      `[viewer] Hintergrundbild "${wahl.bild}" nicht ladbar — gezeichnetes Holz bleibt stehen.`,
+    );
+    return;
+  }
+
+  buehne.dataset['hintergrund'] = 'bild';
+  buehne.dataset['darstellung'] = bildDarstellung(bild.naturalWidth, bild.naturalHeight);
+
+  // Der Wert kommt aus katalog.json, in Phase 1 aus Storyblok. Anführungs-
+  // zeichen und Rückstriche maskieren, damit er die url()-Angabe nicht
+  // verlassen kann.
+  const sicher = wahl.bild.replaceAll('\\', String.raw`\\`).replaceAll('"', String.raw`\"`);
+  buehne.style.backgroundImage = `url("${sicher}")`;
+}
+
+function ladeBild(quelle: string): Promise<HTMLImageElement | undefined> {
+  return new Promise((fertig) => {
+    const bild = new Image();
+    bild.addEventListener('load', () => fertig(bild), { once: true });
+    bild.addEventListener('error', () => fertig(undefined), { once: true });
+    bild.src = quelle;
+  });
 }
 
 function hole<T extends HTMLElement>(id: string): T {
@@ -114,7 +157,8 @@ async function start(): Promise<void> {
   el.titel.textContent = katalog.titel;
   el.download.href = `/katalog/${katalog.download_pdf}`;
   document.documentElement.style.setProperty('--akzent', katalog.akzentfarbe);
-  setzeHintergrund(el.buehne, katalog.hintergrund);
+  // Nicht abgewartet: Der Katalog soll nicht auf das Hintergrundbild warten.
+  void setzeHintergrund(el.buehne, katalog.hintergrund);
 
   const erste = katalog.seiten[0];
   if (!erste) throw new Error('Der Katalog enthält keine Seiten.');

@@ -102,6 +102,26 @@ body {
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 211px);
 }
 
+/* Hintergrundbild. Die URL setzt der Viewer erst, wenn das Bild geladen ist —
+   bis dahin steht das gezeichnete Holz darunter, und bei einem fehlenden Bild
+   bleibt es stehen. */
+.buehne[data-hintergrund='bild'] {
+  background-color: var(--holz-grund, #8a5a33);
+  background-position: center;
+}
+
+/* Kleine Texturen wiederholen sich, große Fotos füllen. Entschieden wird das
+   anhand der tatsächlichen Bildgröße, nicht per Einstellung. */
+.buehne[data-darstellung='kachel'] {
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.buehne[data-darstellung='fuellend'] {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .buehne[data-hintergrund='grau'] {
   background: #e9e9e9;
 }
@@ -110,9 +130,14 @@ body {
   background: #262626;
 }
 
-/* Das Buch soll auf dem Untergrund liegen, nicht darauf kleben. */
+/* Das Buch soll auf dem Untergrund liegen, nicht darauf kleben.
+   Auf hellem Grau wäre der Schatten zu hart, dort fällt er weicher aus. */
 .buehne[data-hintergrund]:not([data-hintergrund='grau']) .seite {
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+
+.buehne[data-hintergrund='grau'] .seite {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
 }
 
 .buehne {

@@ -6,8 +6,8 @@
  * Phase 0: everything lands in a local directory. Phase 1 adds the Storyblok
  * upload on top without changing what is produced here.
  */
-import { access, constants } from 'node:fs/promises';
-import { basename, join, resolve } from 'node:path';
+import { access, constants, copyFile } from 'node:fs/promises';
+import { basename, extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { baueTextHtml, baueSuchindex, extrahiereAlleSeiten, findeToc } from './extract.ts';
@@ -27,8 +27,9 @@ Optionen
   --slug <text>    Kurzname für die URL     (Standard: aus dem Dateinamen)
   --titel <text>   Anzeigetitel             (Standard: aus den PDF-Metadaten)
   --farbe <hex>    Akzentfarbe              (Standard: #0057a0)
-  --hintergrund    Untergrund des Katalogs  (Standard: holz)
-                   holz · holz-dunkel · grau · dunkel · oder ein Hex-Wert
+  --hintergrund    Untergrund des Katalogs  (Standard: mitgeliefertes Holzbild)
+                   Pfad zu einem Bild · holz · holz-dunkel · grau · dunkel
+                   · oder ein Hex-Wert. Ein Bild wird in die Ausgabe kopiert.
   --hilfe          Diese Übersicht
 
 Beispiel
@@ -52,6 +53,17 @@ interface Optionen {
 export const HINTERGRUND_VORLAGEN = ['holz', 'holz-dunkel', 'grau', 'dunkel'] as const;
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
+const BILDENDUNG = /\.(jpe?g|png|webp|avif)$/i;
+
+export function istBildpfad(wert: string): boolean {
+  return BILDENDUNG.test(wert);
+}
+
+export function istGueltigerHintergrund(wert: string): boolean {
+  if ((HINTERGRUND_VORLAGEN as readonly string[]).includes(wert)) return true;
+  if (HEX.test(wert)) return true;
+  return istBildpfad(wert);
+}
 
 export function leseArgumente(argv: string[]): Optionen | 'hilfe' {
   const { values, positionals } = parseArgs({
@@ -84,11 +96,11 @@ export function leseArgumente(argv: string[]): Optionen | 'hilfe' {
   }
 
   const hintergrund = values.hintergrund ?? 'holz';
-  const istVorlage = (HINTERGRUND_VORLAGEN as readonly string[]).includes(hintergrund);
-  if (!istVorlage && !HEX.test(hintergrund)) {
+  if (!istGueltigerHintergrund(hintergrund)) {
     throw new Error(
-      `--hintergrund muss eine Vorlage (${HINTERGRUND_VORLAGEN.join(', ')}) ` +
-        `oder ein Hex-Wert wie #3b2a1a sein, war "${hintergrund}"`,
+      `--hintergrund muss ein Bildpfad (.jpg/.png/.webp/.avif), eine Vorlage ` +
+        `(${HINTERGRUND_VORLAGEN.join(', ')}) oder ein Hex-Wert wie #3b2a1a sein, ` +
+        `war "${hintergrund}"`,
     );
   }
 
@@ -178,6 +190,24 @@ async function main(): Promise<void> {
       : '  Kein Inhaltsverzeichnis erkannt — muss von Hand gepflegt werden',
   );
 
+  // Ein Hintergrundbild wandert mit in die Ausgabe, damit der Katalogordner
+  // für sich allein vollständig ist. In der katalog.json steht dann ein Pfad
+  // relativ zu ihr — genau wie bei den Seitenbildern.
+  let hintergrund = optionen.hintergrund;
+  if (istBildpfad(hintergrund)) {
+    const quelle = resolve(hintergrund);
+    try {
+      await access(quelle, constants.R_OK);
+    } catch {
+      throw new Error(`Hintergrundbild nicht gefunden oder nicht lesbar: ${quelle}`);
+    }
+
+    const zielname = `hintergrund${extname(quelle).toLowerCase()}`;
+    await copyFile(quelle, join(zielVerzeichnis, zielname));
+    hintergrund = zielname;
+    console.log(`  Hintergrundbild übernommen: ${zielname}`);
+  }
+
   const seiten: Seite[] = bilder.dateien.map((datei, i) => ({
     nr: i + 1,
     bild: join('pages', datei),
@@ -192,7 +222,7 @@ async function main(): Promise<void> {
     seitenzahl: info.seitenzahl,
     ausrichtung: bilder.ausrichtung,
     akzentfarbe: optionen.farbe,
-    hintergrund: optionen.hintergrund,
+    hintergrund,
     download_pdf: basename(pdfPfad),
     seiten,
     toc,
