@@ -34,6 +34,9 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 - [ ] T-011  Patch 3: Tastatur- und ARIA-Ebene (←/→/Pos1/Ende, `role`, `aria-live`, Fokusring)  (Prio: hoch · abhängig von: T-008)
 - [ ] T-012  Standalone-Viewer im HTML-Modus, liest `katalog.json`  (Prio: hoch · abhängig von: T-007, T-009)
 - [ ] T-013  Doppelseite Desktop / Einzelseite mobil, Nachladefenster ±2 Seiten  (Prio: hoch · abhängig von: T-012)
+      Doppelseite NUR bei Hochformat. Querformat/16:9 immer einzeln — zwei 16:9-Seiten
+      nebeneinander ergäben 32:9. Seitenverhältnis kommt aus `katalog.json`, nichts fest
+      verdrahten. Siehe docs/ARCHITECTURE.md, Abschnitt „Seitenformate".
 - [ ] T-014  Messpunkt echte Hardware: 150-Seiten-Katalog auf iPhone + Mid-Range-Android  (Prio: hoch · abhängig von: T-013)
       Misst Speicher, Wischqualität, Ladezeit. Ergebnis entscheidet, ob der Fork so bleibt.
 
@@ -52,11 +55,22 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 - [ ] T-025  axe/pa11y in CI grün auf den Textrouten + manueller Tastatur-/NVDA-Durchlauf
 - [ ] T-026  CI-Theme final (Logo, Farben, Schrift)
 
+## Übernächster Sprint — Phase 2 (erfolgskritisch, nicht optional)
+
+> Erst hier wird das Erfolgskriterium aus `docs/DISCOVERY.md` eingelöst: Zeitersparnis für
+> die Redaktion. Solange nur der Kommandozeilen-Befehl existiert, delegiert die Redaktion
+> ihre Arbeit an die Entwicklung, statt Zeit zu sparen.
+
+- [ ] T-027  Interne Upload-Oberfläche: PDF reinziehen → Generator läuft → veröffentlicht
+- [ ] T-028  Statusanzeige während der Verarbeitung (2–8 Minuten je Katalog)
+- [ ] T-029  Authentifizierung fürs Team  (abhängig von: T-027)
+- [ ] T-030  Bedienanleitung für die Redaktion — Zielgruppe Nicht-Entwickler
+- [ ] T-031  Abnahme: jemand aus der Redaktion veröffentlicht einen echten Katalog selbst
+
 ## Icebox
 
 <!-- Ideen ohne Termin — bewusst geparkt -->
 
-- Phase 2: Interne Upload-Seite (PDF reinziehen → veröffentlichen) + Auth fürs Team
 - Phase 3: Zoom/Lupe, Thumbnail-Leiste, Produkt-Hotspots, Teilen-Links, Aufruf-Statistik,
   Treffer-Highlighting via unsichtbarer Textebene
 - Eigener Objektspeicher (R2/S3) statt Storyblok-Assets — erst relevant bei Tarifwechsel

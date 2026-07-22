@@ -2,6 +2,20 @@
 
 > Letzte Aktualisierung: 2026-07-22
 > Aufgaben im Detail: `docs/BACKLOG.md` (einzige Task-Quelle). Diese Datei zeigt die grobe Linie.
+> **Zieltermin erste produktive Fassung: Ende September / Mitte Oktober 2026** (2–3 Monate).
+
+## Was diese Roadmap steuert
+
+Erfolgsmaßstab des Projekts ist laut `docs/DISCOVERY.md` **die Zeitersparnis der Redaktion** —
+nicht Lizenzkosten, nicht SEO, nicht Rechtssicherheit. Daraus folgt eine Priorisierung, die
+vom ursprünglichen Phasenplan abweicht:
+
+> **Phase 2 (Upload-Oberfläche) ist nicht optional.** Solange nur der Kommandozeilen-Befehl
+> existiert, läuft jede Veröffentlichung über die Entwicklung — die Redaktion spart dann keine
+> Zeit, sie delegiert sie. Erst mit Phase 2 erreicht das Projekt sein erklärtes Ziel.
+
+Phase 0 und 1 bleiben trotzdem zuerst dran: Ohne funktionierenden Generator und Viewer gibt es
+nichts, was eine Oberfläche auslösen könnte.
 
 ## Status-Legende
 
@@ -62,12 +76,16 @@ Beweist Optik, Bedienung und Datenstruktur an einem echten PDF. Ohne Storyblok.
 
 **Ergebnis:** `katalog-build kunde-q3.pdf` → Katalog in Storyblok, im Visual Editor platzierbar.
 
-## Milestone 3: Phase 2 — Upload-Seite (Ziel: offen)
+## Milestone 3: Phase 2 — Upload-Seite (**erfolgskritisch**)
+
+Hier wird das Erfolgskriterium erst eingelöst. Nicht als „optional" behandeln.
 
 | Feature | Status | Aufwand | Notizen |
 | --- | --- | --- | --- |
 | Interne Weboberfläche für PDF-Upload | ⚪ | L | Statusanzeige während der Verarbeitung |
 | Authentifizierung fürs Team | ⚪ | M | Erst hier wird das Threat Model scharf |
+| Bedienanleitung für die Redaktion | ⚪ | S | Zielgruppe sind Nicht-Entwickler — Liefergegenstand, keine Kür |
+| Abnahme durch die Redaktion | ⚪ | S | Jemand aus dem Team veröffentlicht einen echten Katalog selbst |
 
 ## Backlog (noch nicht eingeplant)
 

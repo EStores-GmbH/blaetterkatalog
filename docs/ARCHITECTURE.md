@@ -78,6 +78,27 @@ Ladezeit, Traffic- und API-Kontingent belasten, ohne gebraucht zu werden.
 von der Festplatte, in Phase 1 wird aus derselben Struktur die Story. Aufbau siehe Projektbrief
 Abschnitt 6.
 
+## Seitenformate — Hoch- und Querformat
+
+Es kommen **gemischte Formate** vor: klassische A4-Kataloge im Hochformat und Präsentationen
+im Querformat 16:9 (wie die untersuchte igefa-Broschüre, 3000 × 1688 px).
+
+Das ist keine Kleinigkeit für den Viewer. Zwei Hochformat-Seiten nebeneinander ergeben eine
+Doppelseite mit etwa 1,4:1 — das entspricht einem aufgeschlagenen Heft und funktioniert.
+**Zwei 16:9-Seiten nebeneinander ergäben 32:9** — ein Bildstreifen, der auf keinem Bildschirm
+sinnvoll darstellbar ist.
+
+**Regel:** Das Seitenverhältnis entscheidet über die Darstellung, nicht eine feste Einstellung.
+
+| Format des PDF | Darstellung Desktop | Darstellung mobil |
+| --- | --- | --- |
+| Hochformat (A4, A5, Portrait) | Doppelseite | Einzelseite |
+| Querformat (16:9, Präsentationen) | **Einzelseite** | Einzelseite |
+
+Der Generator liest Breite und Höhe je Seite aus dem PDF und schreibt sie in `katalog.json`.
+Der Viewer leitet daraus ab, ob Doppelseiten überhaupt in Frage kommen. Nichts davon wird
+fest verdrahtet — auch nicht die Annahme „A4".
+
 ## Externe Abhängigkeiten
 
 | Service | Zweck | Kosten/Monat | Fallback |
