@@ -1,0 +1,13 @@
+{
+  "name": "@blaetterkatalog/generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Erzeugt aus einem PDF Seitenbilder, Seitentext, Inhaltsverzeichnis und Suchindex",
+  "type": "module",
+  "bin": {
+    "katalog-build": "./src/cli.ts"
+  },
+  "engines": {
+    "node": ">=22.6"
+  }
+}

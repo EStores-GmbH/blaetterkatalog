@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Node führt die .ts-Dateien direkt aus (--experimental-strip-types).
+    // TypeScript prüft nur, es baut nichts.
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+
+    // Type-Stripping kann diese Konstrukte nicht übersetzen — sie brauchen
+    // eine echte Übersetzung. Der Compiler verbietet sie deshalb hier.
+    "erasableSyntaxOnly": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts"]
+}

@@ -16,18 +16,13 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 - [ ] T-001  B2B-Status rechtlich klären: greift das BFSG?  (Prio: hoch · Verantwortlich: Armin/Rechtsberatung)
       Ein Ausschluss nur in den AGB trägt nicht. Bis zur Klärung gilt: BFSG greift.
       Entscheidet, ob HTML-Textfassung + Barrierefreiheitserklärung Pflicht oder Empfehlung sind.
-- [ ] T-002  Poppler installieren (`brew install poppler`)  (Prio: hoch)
-      Liefert `pdftoppm`, `pdftotext`, `pdfinfo`. Aktuell ist keines davon auf dem Rechner.
-- [ ] T-003  Beispiel-PDF nach `fixtures/` legen  (Prio: hoch · Verantwortlich: Armin)
-      Möglichst realistische Seitenzahl, damit T-013 aussagekräftig ist. Klärt zugleich Format
-      (A4 hoch? A3? Querformat) — siehe Projektbrief Abschnitt 8, Frage 3.
+- [ ] T-032  **Druckfassung des Beispiel-PDF besorgen**  (Prio: hoch · Verantwortlich: Armin)
+      Die vorliegende Datei ist der Web-Export mit 72-ppi-Fotos. Text bleibt scharf (Vektor),
+      Produktfotos werden beim Vergrößern weich. Für die Beurteilung der Bildqualität brauchen
+      wir die Fassung vor dem Herunterrechnen.
 
 ## Aktueller Sprint — Phase 0 (Prototyp, ohne Storyblok)
 
-- [ ] T-004  `pdf-tools.ts`: CLI-Verfügbarkeit prüfen, Fehlermeldung mit Installationsbefehl  (Prio: hoch · abhängig von: T-002)
-- [ ] T-005  `render.ts`: PDF → JPEG pro Einzelseite, Auflösung parametrisierbar, längste Kante ≤ 4.000 px  (Prio: hoch · abhängig von: T-004)
-- [ ] T-006  `extract.ts`: Seitentext → `text_html` **und** Suchindex  (Prio: hoch · abhängig von: T-004)
-- [ ] T-007  `manifest.ts`: `katalog.json` schreiben (Scharnier zu Phase 1)  (Prio: hoch · abhängig von: T-005, T-006)
 - [ ] T-008  StPageFlip nach `packages/flip-engine/` forken, Herkunft + Version in `HERKUNFT.md`  (Prio: hoch)
 - [ ] T-009  Patch 1: Animationsschleife stoppbar machen (`cancelAnimationFrame` aus `destroy()`)  (Prio: hoch · abhängig von: T-008)
 - [ ] T-010  Patch 2: Bild-Fehlerbehandlung (`onerror`) gegen Endlos-Ladekringel  (Prio: mittel · abhängig von: T-008)
@@ -83,3 +78,24 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 <!-- Abgeschlossene Tasks hierher verschieben: [x] T-XXX ... (2026-07-07) -->
 
 - [x] T-000  Projektbrief Fassung 2 nach technischer Prüfung (Engine, Storyblok, BFSG/SEO)  (2026-07-22)
+- [x] T-002  Poppler installiert (26.07.0) und mit einem Test-PDF durchgeprüft  (2026-07-22)
+- [x] T-003  Beispiel-PDF geliefert und analysiert — HoReCa Table Top Q3/26, 46 Seiten, A4 hoch  (2026-07-22)
+      Befunde, die T-005 und T-006 bestimmen:
+      · Textextraktion funktioniert — 40 von 46 Seiten, 28.433 Zeichen gesamt
+      · `pdftotext` OHNE `-layout` verwenden: fügt getrennte Wörter wieder zusammen.
+        Mit `-layout` bleiben 21 Wörter am Zeilenende zerrissen.
+      · Inhaltsverzeichnis steht maschinenlesbar auf Seite 3 (Kapitel + Seitenzahl) —
+        die im Brief vorgesehene manuelle Config je Katalog entfällt damit
+      · PDF ist getaggt (InDesign) — relevant für Projektbrief Abschnitt 8, Frage 7
+      · Fotos liegen bei 72 ppi vor, Text ist Vektor. Rendern bei 200 dpi ergibt
+        1654 × 2339 px und ~305 KB je Seite, also ~14 MB für den ganzen Katalog.
+- [x] T-004  `pdf-tools.ts` — Werkzeugprüfung mit Installationshinweis, `pdfinfo`-Auswertung  (2026-07-22)
+- [x] T-005  `render.ts` — Einzelseiten als JPEG, Auflösung aus dem Seitenformat abgeleitet  (2026-07-22)
+      A4 verträgt volle 300 dpi; der 4.000-px-Deckel greift erst ab 342 dpi. A3 wird früher begrenzt.
+- [x] T-006  `extract.ts` — Seitentext, Suchindex, Inhaltsverzeichnis  (2026-07-22)
+      Inhaltsverzeichnis wird von der gedruckten Inhaltsseite gelesen; die manuelle Config
+      je Katalog aus dem Brief entfällt. Weiche Trennzeichen aus InDesign werden entfernt —
+      im Wortinneren hätten sie die Volltextsuche unbrauchbar gemacht.
+- [x] T-007  `manifest.ts` — `katalog.json` + getrennte `suchindex.json`  (2026-07-22)
+      Erster Durchlauf am echten Katalog: 46 Seiten in 8,6 s, 13 MB Bilder,
+      katalog.json 45 KB, suchindex.json 33 KB. 44 Tests grün, Typprüfung sauber.
