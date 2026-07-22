@@ -23,10 +23,10 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 
 ## Aktueller Sprint — Phase 0 (Prototyp, ohne Storyblok)
 
-- [ ] T-008  StPageFlip nach `packages/flip-engine/` forken, Herkunft + Version in `HERKUNFT.md`  (Prio: hoch)
-- [ ] T-009  Patch 1: Animationsschleife stoppbar machen (`cancelAnimationFrame` aus `destroy()`)  (Prio: hoch · abhängig von: T-008)
-- [ ] T-010  Patch 2: Bild-Fehlerbehandlung (`onerror`) gegen Endlos-Ladekringel  (Prio: mittel · abhängig von: T-008)
-- [ ] T-011  Patch 3: Tastatur- und ARIA-Ebene (←/→/Pos1/Ende, `role`, `aria-live`, Fokusring)  (Prio: hoch · abhängig von: T-008)
+- [ ] T-011  Tastatur- und ARIA-Ebene (←/→/Pos1/Ende, `role`, `aria-live`, Fokusring)  (Prio: hoch · abhängig von: T-012)
+      **Umgezogen: gehört in den Viewer, nicht in den Fork.** Im HTML-Modus liefern wir die
+      Seitenelemente selbst — Beschriftung und Fokus gehören ohnehin in unseren Code, und
+      jede nicht geänderte Zeile Fremdcode erleichtert den späteren Abgleich.
 - [ ] T-012  Standalone-Viewer im HTML-Modus, liest `katalog.json`  (Prio: hoch · abhängig von: T-007, T-009)
 - [ ] T-013  Doppelseite Desktop / Einzelseite mobil, Nachladefenster ±2 Seiten  (Prio: hoch · abhängig von: T-012)
       Doppelseite NUR bei Hochformat. Querformat/16:9 immer einzeln — zwei 16:9-Seiten
@@ -99,3 +99,12 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 - [x] T-007  `manifest.ts` — `katalog.json` + getrennte `suchindex.json`  (2026-07-22)
       Erster Durchlauf am echten Katalog: 46 Seiten in 8,6 s, 13 MB Bilder,
       katalog.json 45 KB, suchindex.json 33 KB. 44 Tests grün, Typprüfung sauber.
+- [x] T-008  StPageFlip 2.0.7 einvendort nach `packages/flip-engine/`  (2026-07-22)
+      Herkunft, Lizenz und jede Änderung dokumentiert in `packages/flip-engine/HERKUNFT.md`.
+      Unerwarteter Zusatzaufwand: Der Code enthielt sieben `const enum`, Parameter-
+      Eigenschaften und einen CSS-Import — alles Konstrukte, die Node nicht direkt
+      ausführen kann. Als PATCH 0 umgeschrieben, ohne Verhaltensänderung.
+- [x] T-009  Patch 1 — Animationsschleife anhaltbar  (2026-07-22)
+      `destroy()` hielt die Schleife nie an. Mit Browser-Attrappe nachgewiesen,
+      dass sie sich nach `stop()` nicht neu einplant.
+- [x] T-010  Patch 2 — Bild-Fehlerbehandlung gegen Endlos-Ladekringel  (2026-07-22)

@@ -24,5 +24,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts"]
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts"],
+
+  // Der einvendorte StPageFlip-Fork hat seine eigene Konfiguration — er wurde
+  // ohne Strict-Modus geschrieben und braucht die DOM-Typen.
+  // Geprüft wird er trotzdem: `npm run type-check` ruft beide Konfigurationen auf.
+  "exclude": ["packages/flip-engine/**", "node_modules", "out"]
 }
