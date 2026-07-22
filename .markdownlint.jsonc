@@ -1,0 +1,23 @@
+{
+  // Markdown-Regeln für dieses Repo. Ohne diese Datei meldet der Editor
+  // Warnungen zu reinen Stilfragen, die hier bewusst offen bleiben.
+  "default": true,
+
+  // Zeilenlänge: Fließtext in docs/ wird bewusst nicht hart umbrochen.
+  "MD013": false,
+
+  // Tabellen-Pipe-Abstände: im Repo gemischt (|---| und | --- |). Beides
+  // rendert identisch; Vereinheitlichen wäre reine Textumwälzung.
+  "MD060": false,
+
+  // Nackte URLs: Doku-Verweislisten sind als Klartext-URL besser kopierbar
+  // als in spitzen Klammern.
+  "MD034": false,
+
+  // Inline-HTML: in den Vorlagen für Kommentare und Details-Blöcke nötig.
+  "MD033": false,
+
+  // Gleichlautende Überschriften: in Changelog und Backlog gewollt
+  // ("Added"/"Changed" je Version).
+  "MD024": { "siblings_only": true }
+}

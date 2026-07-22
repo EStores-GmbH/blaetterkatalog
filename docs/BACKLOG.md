@@ -55,6 +55,7 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 ## Icebox
 
 <!-- Ideen ohne Termin — bewusst geparkt -->
+
 - Phase 2: Interne Upload-Seite (PDF reinziehen → veröffentlichen) + Auth fürs Team
 - Phase 3: Zoom/Lupe, Thumbnail-Leiste, Produkt-Hotspots, Teilen-Links, Aufruf-Statistik,
   Treffer-Highlighting via unsichtbarer Textebene
@@ -66,4 +67,5 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 ## Erledigt
 
 <!-- Abgeschlossene Tasks hierher verschieben: [x] T-XXX ... (2026-07-07) -->
+
 - [x] T-000  Projektbrief Fassung 2 nach technischer Prüfung (Engine, Storyblok, BFSG/SEO)  (2026-07-22)

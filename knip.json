@@ -1,14 +1,22 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "_hinweis": "An Stack anpassen. Findet ungenutzte Dateien, Exports und Dependencies.",
-  "entry": [
-    "src/main.{js,ts,tsx}",
-    "src/index.{js,ts,tsx}",
-    "src/pages/**/*.{astro,ts,tsx}",
-    "app/**/*.{ts,tsx}",
-    "src/app/**/*.{ts,tsx}"
-  ],
-  "project": ["src/**/*.{js,ts,tsx,astro}", "app/**/*.{ts,tsx}"],
+  "_hinweis": "Findet ungenutzte Dateien, Exports und Dependencies. Monorepo mit npm-Workspaces.",
+  "workspaces": {
+    "packages/generator": {
+      "entry": ["src/cli.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/viewer": {
+      "entry": ["src/pages/**/*.{astro,ts}", "src/**/*Island.ts"],
+      "project": ["src/**/*.{ts,astro}"]
+    },
+    "packages/flip-engine": {
+      "_hinweis": "Einvendorter StPageFlip-Fork — Upstream-Code nicht auf ungenutzte Exports prüfen",
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"],
+      "ignore": ["src/**"]
+    }
+  },
   "ignoreDependencies": ["lefthook", "@lhci/cli", "pa11y-ci"],
-  "ignore": ["**/*.test.*", "tests/**"]
+  "ignore": ["**/*.test.*", "**/test/**", "fixtures/**", "out/**"]
 }

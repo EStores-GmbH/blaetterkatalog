@@ -1,15 +1,15 @@
 [
   {
-    "_hinweis": "Pfade an Build-Output anpassen (dist/.next). Budgets klein halten = guter LCP/INP.",
-    "name": "JS gesamt (initial)",
-    "path": ["dist/**/*.js", ".next/static/**/*.js"],
-    "limit": "180 kB",
+    "_hinweis": "Astro baut nach packages/viewer/dist/. Budget klein halten = guter LCP/INP.",
+    "name": "Viewer-JS (Island + Flip-Engine)",
+    "path": ["packages/viewer/dist/**/*.js"],
+    "limit": "120 kB",
     "gzip": true
   },
   {
     "name": "CSS gesamt",
-    "path": ["dist/**/*.css", ".next/static/**/*.css"],
-    "limit": "60 kB",
+    "path": ["packages/viewer/dist/**/*.css"],
+    "limit": "40 kB",
     "gzip": true
   }
 ]

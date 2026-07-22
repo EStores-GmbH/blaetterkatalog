@@ -1,56 +1,83 @@
 # Blätterkatalog — Claude Code Kontext
 
 ## Projekt-Profil
+
 > Per `/project-type` gesetzt. Bestimmt Pflicht-Skills und Compliance-Checklisten.
 
-- **Profil:** [marketing-site / headless-cms-site / internal-tool / public-app-pii]
-- **Verarbeitet Personendaten:** [ja / teilweise / nein]
-- **Pflicht-Skills:** [aus Profil-Matrix in /project-type]
-- **Compliance:** siehe `docs/COMPLIANCE.md` (+ `docs/THREAT-MODEL.md` bei public-app-pii)
+- **Profil:** headless-cms-site
+- **Verarbeitet Personendaten:** teilweise (Cookies / Analytics — ohne Nutzer-Accounts)
+- **Pflicht-Skills:** security, testing, accessibility, seo-performance, headless-cms
+- **Compliance:** siehe `docs/COMPLIANCE.md` (BFSG/a11y, SEO/CWV, Cookie-Consent)
 - **Claude-Bausteine:** Skills, Agents, Commands, Hooks und Verhaltens-Rules kommen aus den
   **estores-Plugins** (Marketplace, via `.claude/settings.json`) — nicht lokal im Repo. Siehe `.claude/PLUGINS.md`.
+- **Aktive Plugins:** `estores-core@estores`, `estores-web@estores`
 
 ## Verhaltensregeln (einzige Quelle: AGENTS.md)
+
 @AGENTS.md
 
 ## Projekt-Überblick
-- **Produkt**: [Kurzbeschreibung — was macht dieses Produkt?]
-- **Stack**: [z.B. Next.js 15 / Laravel 11 / Vue 3 / FastAPI / React Native]
-- **Sprache(n)**: [TypeScript / PHP / Python / Kotlin / etc.]
-- **CSS/Styling**: [Tailwind / SCSS / styled-components / Bootstrap / etc.]
-- **Datenbank**: [PostgreSQL / MySQL / MongoDB / Supabase / etc.]
-- **ORM**: [Prisma / Eloquent / SQLAlchemy / Drizzle / etc.]
-- **Deployment**: [z.B. Vercel (Prod) + Coolify (Staging) / Hetzner / Railway / etc.]
-- **Team**: [Namen / Rollen]
+
+- **Produkt**: Generator, der aus einem druckfertigen PDF einen interaktiven Blätterkatalog
+  (Page-Flip) erzeugt, ihn automatisch in Storyblok veröffentlicht und im Astro-Frontend als
+  platzierbaren Block ausliefert. Ersetzt das kommerzielle „Flip PDF Plus Pro".
+- **Leitprinzip**: Die **HTML-Textfassung ist das Fundament**, der Blätterkatalog die Oberfläche
+  darüber. Barrierefreiheit, Google-Indexierung und Tastaturbedienung hängen alle daran.
+- **Stack**: Node.js 22 + TypeScript (Generator) · Astro (Frontend) · Storyblok (Headless CMS)
+- **Sprache(n)**: TypeScript (strict)
+- **CSS/Styling**: noch offen — wird mit dem CI-Theme in Phase 1 entschieden (T-026)
+- **Datenbank**: keine. Inhalte liegen in Storyblok, Bilder als Storyblok-Assets.
+- **ORM**: keiner — entfällt mangels Datenbank
+- **Deployment**: noch offen. SSG-Build + Rebuild-Webhook; Zielplattform in Phase 1 festlegen.
+- **Team**: Armin Trunk
 
 ## Wichtige Befehle
+
 ```bash
-# An den tatsächlichen Stack anpassen:
-[start-cmd]      # Dev-Server starten  (z.B. npm run dev / php artisan serve / uvicorn)
-[build-cmd]      # Production Build    (z.B. npm run build / composer install --no-dev)
-[test-cmd]       # Tests ausführen     (z.B. npm test / php artisan test / pytest)
-[lint-cmd]       # Linting             (z.B. npm run lint / ./vendor/bin/pint)
-[typecheck-cmd]  # Typ-Prüfung         (z.B. npx tsc --noEmit / mypy .)
-[migrate-cmd]    # DB-Migration        (z.B. npx prisma migrate / php artisan migrate)
+# Systemvoraussetzung (einmalig, siehe docs/BACKLOG.md T-002):
+brew install poppler          # liefert pdftoppm, pdftotext, pdfinfo
+
+# Ab Phase 0 (packages/ existiert noch nicht — Befehle entstehen mit T-004 ff.):
+npm run katalog-build <pdf>   # Generator: PDF → Bilder + Text + katalog.json
+npm run dev                   # Astro-Dev-Server (Port 4321)
+npm run build                 # Production-Build (SSG)
+npm run preview               # gebauten Stand lokal ansehen
+npm test                      # Tests
+npm run lint                  # Linting
+npx tsc --noEmit              # Typ-Prüfung
 ```
 
+> **Achtung:** Ein `build`-Script in `package.json` schaltet die Web-Quality-Gates in der CI
+> scharf (Lighthouse, pa11y, size-limit). Erst anlegen, wenn es auch etwas zu bauen gibt.
+
 ## Code-Konventionen
-- Sprache: [TypeScript strict / PHP 8.3 / Python 3.12 / etc.] — kein untypisiertes ohne Kommentar
-- Komponenten/Module: [Funktional / Klassen-basiert / etc.]
-- Naming: [camelCase / snake_case / PascalCase — je nach Sprache und Framework-Standard]
-- Imports: [Absolute Pfade via `@/` / PSR-4 Autoloading / etc.]
-- CSS/Styling: [Tailwind-first / BEM / CSS Modules / etc.]
-- Error Handling: Immer explizit — keine stillen Failures
+
+- Sprache: TypeScript strict — kein `any` ohne begründenden Kommentar
+- Komponenten/Module: funktional; Astro-Komponenten serverseitig, Interaktivität nur in Islands
+- Naming: `camelCase` für Werte und Funktionen, `PascalCase` für Typen und Komponenten,
+  `kebab-case` für Dateinamen
+- Imports: absolute Pfade innerhalb eines Pakets, Pakete untereinander über den Workspace-Namen
+- Fachbegriffe im Code auf Englisch, Kommentare auf Englisch, Nutzertexte auf Deutsch
+- Error Handling: Immer explizit — keine stillen Failures. Der Generator bricht mit
+  verständlicher Meldung ab, statt halbe Kataloge zu veröffentlichen.
 - Tests: Für jede neue Funktion mind. ein Unit-Test
 
 ## Architektur-Entscheidungen
-- State Management: [Zustand / Pinia / Redux / etc. oder keins]
-- Datenabruf: [Server Components / React Query / SWR / Axios / etc.]
-- Auth: [Auth.js / Clerk / Laravel Sanctum / JWT / etc.]
-- DB-Zugriff: [Prisma / Eloquent / SQLAlchemy / raw SQL / etc.]
-- API-Layer: [tRPC / REST / GraphQL / etc.]
+
+> Vollständig mit Begründung in `decisions/log.md`, Überblick in `docs/ARCHITECTURE.md`.
+
+- **Blätter-Engine**: StPageFlip als **einvendorter Fork** in `packages/flip-engine/`,
+  betrieben im **HTML-Modus** (`loadFromHTML`) — nie im Canvas-Modus
+- **Datenabruf**: zur **Build-Zeit** (SSG), Rebuild per Storyblok-Webhook. Kein CMS-Token im Browser.
+- **State Management**: keins — der Viewer hält seinen Zustand lokal in der Island
+- **Suche**: Fuse.js im Web Worker, Index als statische Datei, erst beim Öffnen der Suche geladen
+- **Auth**: erst in Phase 2 relevant (interne Upload-Seite)
+- **API-Layer**: keiner — Storyblok Management API im Generator, Content Delivery API beim Build
 
 ## Aktuelle Prioritäten & Backlog
+
 - Sprint-Fokus (persönlich, gitignored):
 @context/current-priorities.md
+
 - Team-Backlog: `docs/BACKLOG.md` — einzige Task-Quelle, Status dort pflegen
+- Vollständiger Projektkontext: `docs/Blaetterkatalog_Projektbrief.md`

@@ -51,7 +51,7 @@ Produkt-Hotspots/Shop-Links (Roadmap); Download = Original- vs. web-optimiertes 
 
 ## 3. Zielarchitektur
 
-```
+```text
         ┌─────────────┐
   PDF → │  Generator  │
         │  (Node CLI) │
@@ -86,6 +86,7 @@ Produkt-Hotspots/Shop-Links (Roadmap); Download = Original- vs. web-optimiertes 
 ```
 
 **Datenfluss:**
+
 1. Generator rendert PDF-Seiten zu Bildern (**Einzelseiten**, nie Doppelseiten — siehe Abschnitt 4),
    extrahiert **strukturierten Seitentext** und das Inhaltsverzeichnis (aus PDF-Lesezeichen).
 2. Generator lädt via **Storyblok Management API** Seitenbilder + Download-PDF als Assets hoch und legt eine
@@ -119,6 +120,7 @@ ohnehin die bessere Lösung: Auf dem Handy braucht der Viewer die Einzelseitenan
 zweimal vorhalten.
 
 ### Relevante Doku
+
 - Storyblok Management API – Assets: https://www.storyblok.com/docs/api/management/assets
 - Storyblok Image Service: https://www.storyblok.com/docs/api/image-service
 - Storyblok technische Limits: https://www.storyblok.com/pricing/technical-limits
@@ -147,7 +149,7 @@ Teilen-Links, Aufruf-Statistik, Treffer-Highlighting via unsichtbarer Textebene,
 
 ## 6. Repo-Struktur
 
-```
+```text
 blaetterkatalog/
 ├── packages/
 │   ├── generator/                # Node/TS CLI: PDF → Storyblok
@@ -202,7 +204,9 @@ Der **Suchindex** wird bewusst getrennt geschrieben (`suchindex.json`) und erst 
 ## 7. Phasenplan mit konkreten Aufgaben
 
 ### Phase 0 — Prototyp (standalone, ohne Storyblok)
+
 Ziel: Look, Bedienung und Datenstruktur an einem echten PDF beweisen.
+
 - [ ] `pdf-tools.ts`: Prüfung auf `pdftoppm`/`pdftotext`, verständliche Fehlermeldung samt Installationsbefehl.
 - [ ] `render.ts`: PDF → JPEG pro **Einzelseite**, Auflösung parametrisierbar, längste Kante ≤ 4.000 px erzwungen.
 - [ ] `extract.ts`: Seitentext extrahieren → `text_html` **und** Suchindex.
@@ -217,6 +221,7 @@ Ziel: Look, Bedienung und Datenstruktur an einem echten PDF beweisen.
 - [ ] Ergebnis: lokal lauffähiger Blätterkatalog aus einem Beispiel-PDF, tastaturbedienbar.
 
 ### Phase 1 — Kernfunktionen + Storyblok-Anbindung
+
 - [ ] Suche im Viewer (Fuse.js) **im Web Worker**, Index erst beim Öffnen der Suche laden, Trefferzahl per `aria-live`.
 - [ ] Inhaltsverzeichnis-Navigation; Download-Button.
 - [ ] `storyblok.ts`: Assets-Upload (signed request) + Story anlegen/aktualisieren, **Ratenbremse ≤ 5 req/s + 429-Retry**.
@@ -234,10 +239,12 @@ Ziel: Look, Bedienung und Datenstruktur an einem echten PDF beweisen.
 - [ ] Ergebnis: `katalog-build kunde-q3.pdf` → Katalog in Storyblok, im Visual Editor platzierbar.
 
 ### Phase 2 — Upload-Seite (Alltags-Workflow)
+
 - [ ] Kleine interne Weboberfläche: PDF hochladen/reinziehen → ruft Generator → veröffentlicht; Statusanzeige.
 - [ ] Auth für internes Team.
 
 ### Phase 3 — optional
+
 - [ ] Zoom, Thumbnails, Produkt-Hotspots/Shop-Links, Teilen, Statistik, Treffer-Highlight, Webhook-Auslöser.
 
 ---
@@ -261,7 +268,7 @@ Storyblok bleiben, ein eigener Objektspeicher ist erst eine spätere Kostenoptim
 
 ## 9. Kickoff-Prompt für Claude Code
 
-```
+```text
 Lies docs/Blaetterkatalog_Projektbrief.md — das ist der vollständige Kontext.
 
 Wir bauen einen Blätterkatalog-Generator: PDF → interaktiver Page-Flip-Katalog,
@@ -329,6 +336,7 @@ Der igefa-Katalog stammt aus *FlipPDFPlusPro für Mac v6.9.9*. Messwerte: 21 Sei
 zusammen ~12 MB — hochgerechnet auf 150 Seiten rund 85 MB. **Nachladen ist damit Pflicht, nicht Kür.**
 
 Zwei Schwächen, die wir nicht übernehmen:
+
 - `user-scalable=no` im Viewport verbietet Zoomen per Fingergeste — ein dokumentiertes WCAG-Versagensmuster
   (1.4.4), das ausgerechnet Menschen mit Sehbehinderung trifft.
 - Eine vollständige HTML-Textfassung **existiert** (`files/basic-html/`), ist aber nur über `<noscript>`

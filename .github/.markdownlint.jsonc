@@ -1,0 +1,6 @@
+{
+  // GitHub-Vorlagen beginnen absichtlich mit YAML-Frontmatter bzw. einer
+  // H2-Überschrift — GitHub setzt den Titel selbst. Eine H1 wäre hier falsch.
+  "extends": "../.markdownlint.jsonc",
+  "MD041": false
+}

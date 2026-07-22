@@ -2,7 +2,7 @@
   "name": "blaetterkatalog",
   "version": "1.0.0",
   "private": true,
-  "description": "Blätterkatalog",
+  "description": "Blätterkatalog-Generator: PDF → interaktiver Page-Flip-Katalog mit HTML-Textfassung, veröffentlicht in Storyblok, ausgeliefert via Astro",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EStores-GmbH/blaetterkatalog.git"
