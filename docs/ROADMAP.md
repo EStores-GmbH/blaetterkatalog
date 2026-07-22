@@ -1,4 +1,4 @@
-# Roadmap: [Projektname]
+# Roadmap: Blätterkatalog
 
 > Letzte Aktualisierung: [DATUM]
 > Basis: docs/DISCOVERY.md — Kern-Features

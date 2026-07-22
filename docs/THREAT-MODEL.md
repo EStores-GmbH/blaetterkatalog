@@ -1,4 +1,4 @@
-# Threat Model: [Projektname]
+# Threat Model: Blätterkatalog
 
 > Pflicht für Profil **public-app-pii**, empfohlen für **internal-tool**.
 > Lebendiges Dokument — bei Architektur-Änderungen aktualisieren.

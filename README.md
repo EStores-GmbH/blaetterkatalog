@@ -1,23 +1,50 @@
-# EStores Project Template
+# Blätterkatalog
 
-Claude-Code-Startpunkt für alle EStores-Projekttypen: Websites (mit/ohne Headless-CMS),
-interne Tools und öffentliche Tools mit Personendaten. Ein Template, profilgesteuert.
+[Ein bis zwei Sätze: Was ist dieses Projekt und für wen?]
 
-## Verwenden
+## Überblick
+- **Zweck:** [Welches Problem löst es?]
+- **Profil:** [marketing-site / headless-cms-site / internal-tool / public-app-pii]
+- **Status:** [in Entwicklung / Beta / Production]
 
-1. Oben auf **„Use this template"** → eigenes Repo erstellen → klonen.
-2. Projekt initialisieren (ersetzt diese README durch eine Projekt-README und
-   entfernt die Template-Mechanik):
-   ```bash
-   ./scripts/init-project.sh "Mein Projektname"
-   ```
-3. Beim ersten Öffnen in Claude Code Ordner vertrauen → der **estores-Marketplace**
-   und das Plugin `estores-core` werden installiert (Fallback: `.claude/PLUGINS.md`).
-4. Weiter nach **`TEMPLATE-USAGE.md`** — dort steht die vollständige Reihenfolge,
-   alle Commands, Profile, Hooks, CI und Plugin-Optionen.
+## Stack
+- **Framework:** [z.B. Astro 4 / Next.js / Laravel]
+- **Sprache:** [TypeScript / PHP / Python]
+- **Datenbank:** [PostgreSQL / Supabase / …]
+- **Hosting:** [Vercel / Coolify / …]
+> Details und Begründung: `docs/ARCHITECTURE.md`
 
-> Ohne Schritt 2 bleibt die Template-Beschreibung im Projekt stehen — `init-project`
-> sorgt dafür, dass das neue Repo nur das *Projekt* beschreibt.
+## Lokal starten
+```bash
+cp .env.example .env.local      # Secrets eintragen
+[install-cmd]                   # z.B. npm install
+[start-cmd]                     # z.B. npm run dev
+[test-cmd]                      # z.B. npm test
+```
+
+## Projektstruktur (Auszug)
+```
+src/            → Anwendungscode
+docs/           → DISCOVERY, ARCHITECTURE, ROADMAP, COMPLIANCE
+decisions/      → Entscheidungs-Log + ADRs
+tests/          → unit / integration / e2e
+```
+
+## Entwicklung
+- Branching: `feature/[ticket-id]-[name]` → PR → `develop` → `staging` → `main`
+- Neues Feature in Claude Code: `/create-feature`
+- Vor dem Commit: `/local-review`
+- „Fertig" heißt: `templates/definition-of-done.md` erfüllt
+
+## Deployment
+- Staging: `/deploy-staging` · Production: `/release`
+
+## Dokumentation
+- Produkt & Scope → `docs/DISCOVERY.md`
+- Architektur → `docs/ARCHITECTURE.md`
+- Roadmap → `docs/ROADMAP.md`
+- Compliance (DSGVO/BFSG) → `docs/COMPLIANCE.md`
+- Entscheidungen → `decisions/log.md`
 
 ---
-*EStores GmbH / Syntegro*
+*Blätterkatalog — [Jahr]*

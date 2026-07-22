@@ -1,4 +1,4 @@
-# Backlog — [Projektname]
+# Backlog — Blätterkatalog
 
 > Einzige Quelle für offene Tasks. Wird von `/plan` gelesen und von `/create-feature`
 > aktualisiert. Committed — für das ganze Team sichtbar.

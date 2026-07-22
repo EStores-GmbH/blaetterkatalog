@@ -1,4 +1,4 @@
-# Discovery: [Projektname]
+# Discovery: Blätterkatalog
 
 > Phase 0.1 — Ausfüllen bevor irgendwelche technischen Entscheidungen getroffen werden.
 > Nutze den Prompt am Ende dieser Datei um Claude bei der Befüllung zu helfen.

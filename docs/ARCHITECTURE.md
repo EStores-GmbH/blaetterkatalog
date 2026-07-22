@@ -1,4 +1,4 @@
-# Architektur: [Projektname]
+# Architektur: Blätterkatalog
 
 > Phase 0.2 — Nach `/stack-selection` automatisch befüllen lassen.
 > Basis: docs/DISCOVERY.md + decisions/log.md

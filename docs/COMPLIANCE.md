@@ -1,4 +1,4 @@
-# Compliance: [Projektname]
+# Compliance: Blätterkatalog
 
 > Wird vom `/project-type` Command auf das gewählte **Profil** zugeschnitten.
 > Nicht zutreffende Blöcke entfernen. Quelle der Regeln: Skills `privacy-dsgvo` + `accessibility`

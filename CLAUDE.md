@@ -1,4 +1,4 @@
-# [Projektname] — Claude Code Kontext
+# Blätterkatalog — Claude Code Kontext
 
 ## Projekt-Profil
 > Per `/project-type` gesetzt. Bestimmt Pflicht-Skills und Compliance-Checklisten.

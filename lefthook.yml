@@ -10,7 +10,7 @@ pre-commit:
   parallel: true
   commands:
     secrets:
-      run: npx gitleaks protect --staged --redact --no-banner
+      run: gitleaks protect --staged --redact --no-banner
     lint-js:
       glob: "*.{js,jsx,ts,tsx}"
       run: npx eslint {staged_files} --fix --quiet 2>/dev/null || true

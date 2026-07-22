@@ -1,4 +1,4 @@
-# AGENTS.md — [Projektname]
+# AGENTS.md — Blätterkatalog
 
 > **Einzige Quelle** für Verhaltensregeln aller KI-Agenten (Claude Code, Cursor, …).
 > CLAUDE.md importiert diese Datei — Regeln NUR hier pflegen, nie doppelt.

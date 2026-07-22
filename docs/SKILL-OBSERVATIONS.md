@@ -1,4 +1,4 @@
-# Skill-Beobachtungen — [Projektname]
+# Skill-Beobachtungen — Blätterkatalog
 
 > Gesammelt vom Skill `skill-feedback` (estores-core), abgearbeitet via `/skill-review`.
 > Einträge werden nie gelöscht — Status: OFFEN → UMGESETZT / ABGELEHNT.
