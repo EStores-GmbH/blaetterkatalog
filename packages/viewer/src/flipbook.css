@@ -15,6 +15,12 @@
   box-sizing: border-box;
 }
 
+/* Spaltenlayout über die volle Fensterhöhe: Kopf und Leiste nehmen sich, was
+   sie brauchen, die Bühne bekommt den Rest. Ohne das wächst der Katalog über
+   den Bildschirmrand hinaus — die Engine passt die Seite an die verfügbare
+   BREITE an, und ohne begrenzte Höhe wird die Bühne einfach mitgezogen.
+   dvh statt vh, damit die ein- und ausfahrende Browserleiste auf dem Handy
+   nicht dauernd das Layout verschiebt. */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -56,20 +62,31 @@ body {
   font-size: clamp(1.1rem, 3vw, 1.6rem);
 }
 
+/* Die Bühne braucht eine BERECHNETE Höhe, keine Mindesthöhe.
+   Die Engine liest die Höhe ihres Behälters aus und verkleinert die Seite nur,
+   wenn dieser Wert feststeht. Aus einem `flex: 1` allein ergibt sich keiner:
+   Der Behälter würde einfach mit dem Inhalt mitwachsen — genau das ließ den
+   Katalog 427 px unter den Bildschirmrand rutschen.
+   Abgezogen werden Kopfzeile, Bedienhinweis und Leiste. */
 .buehne {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
   background: var(--buehne);
-  min-height: 60vh;
+  height: clamp(320px, calc(100dvh - 11rem), 1000px);
+  /* Die Engine positioniert die nicht sichtbaren Seiten absolut; ohne
+     Beschneidung ragen sie unter den Bildschirmrand und erzeugen eine
+     Bildlaufleiste, obwohl nichts zu sehen ist. */
+  overflow: hidden;
 }
 
 .katalog {
   flex: 1;
   min-width: 0;
-  /* Höhe vorab reserviert, damit beim Aufbau nichts springt (CLS). */
-  min-height: min(80vh, 700px);
+  /* Feste Höhe statt Mindesthöhe: Die Engine liest sie aus und verkleinert
+     die Seite, wenn sie sonst nicht hineinpasst. */
+  height: 100%;
 }
 
 .katalog:focus-visible {
