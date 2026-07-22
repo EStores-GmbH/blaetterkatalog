@@ -11,6 +11,9 @@
 import { fuehreAus } from './pdf-tools.ts';
 import type { SuchindexEintrag, TocEintrag } from './types.ts';
 
+/** Table of contents as parsed — the file position is added later. */
+export type TocRoheintrag = Omit<TocEintrag, 'index'>;
+
 /**
  * `-layout` is deliberately NOT used. It preserves the visual column layout but
  * leaves words broken across lines — 21 of them in the reference catalogue
@@ -124,13 +127,13 @@ const TOC_SUCHTIEFE = 8;
  * Returns an empty list when nothing convincing is found — a wrong table of
  * contents would be worse than none.
  */
-export function findeTocAufSeite(seitentext: string): TocEintrag[] {
+export function findeTocAufSeite(seitentext: string): TocRoheintrag[] {
   const zeilen = seitentext
     .split('\n')
     .map((z) => z.trimEnd())
     .filter((z) => z.trim().length > 0);
 
-  const eintraege: TocEintrag[] = [];
+  const eintraege: TocRoheintrag[] = [];
   let offenesLabel: string | undefined;
 
   for (const zeile of zeilen) {
@@ -197,8 +200,8 @@ function saubereLabel(roh: string): string {
  * cheaper mistake: a missing entry is invisible, a wrong one sends readers to
  * the wrong page.
  */
-function nurAufsteigend(eintraege: TocEintrag[]): TocEintrag[] {
-  const behalten: TocEintrag[] = [];
+function nurAufsteigend(eintraege: TocRoheintrag[]): TocRoheintrag[] {
+  const behalten: TocRoheintrag[] = [];
   let letzteSeite = 0;
 
   for (const eintrag of eintraege) {
@@ -210,7 +213,69 @@ function nurAufsteigend(eintraege: TocEintrag[]): TocEintrag[] {
   return behalten;
 }
 
-export function findeToc(seitentexte: string[]): TocEintrag[] {
+/**
+ * Difference between printed page numbers and PDF page positions.
+ *
+ * A table of contents cites the number printed on the page. Many catalogues
+ * carry unnumbered front matter, so printed page 4 can be the 6th page of the
+ * file — and a table of contents that jumps by the printed number would land
+ * two pages off, on every single entry.
+ *
+ * Pages usually print their number in the footer ("Seite 12"). Comparing that
+ * against the page's position gives the offset. A majority vote guards against
+ * a stray number somewhere in the body text.
+ *
+ * Returns 0 when nothing can be determined — then printed number and position
+ * are assumed to be the same, which is the common case.
+ */
+/** Zeilenweise statt per Sammelausdruck — der wäre auf langen Seiten anfällig. */
+const FUSSZEILE = /^(?:Seite|Page)[ \t]+(\d{1,4})$/;
+
+export function lesGedruckteSeitenzahl(seitentext: string): number | undefined {
+  for (const zeile of seitentext.split('\n')) {
+    const treffer = FUSSZEILE.exec(zeile.trim());
+    if (treffer?.[1]) return Number(treffer[1]);
+  }
+  return undefined;
+}
+
+export function findeSeitenversatz(seitentexte: string[]): number {
+  const stimmen = new Map<number, number>();
+
+  seitentexte.forEach((text, i) => {
+    const gedruckt = lesGedruckteSeitenzahl(text);
+    if (gedruckt === undefined) return;
+
+    const versatz = i + 1 - gedruckt;
+    stimmen.set(versatz, (stimmen.get(versatz) ?? 0) + 1);
+  });
+
+  let besterVersatz = 0;
+  let besteAnzahl = 0;
+  for (const [versatz, anzahl] of stimmen) {
+    if (anzahl > besteAnzahl) {
+      besterVersatz = versatz;
+      besteAnzahl = anzahl;
+    }
+  }
+
+  // Ein einzelner Fund ist zu wenig — das kann eine Zahl im Fließtext sein.
+  return besteAnzahl >= 2 ? besterVersatz : 0;
+}
+
+/** Maps printed page numbers to positions in the file. */
+export function versetzeToc(
+  toc: TocRoheintrag[],
+  versatz: number,
+  seitenzahl: number,
+): TocEintrag[] {
+  return toc.map((eintrag) => ({
+    ...eintrag,
+    index: Math.min(Math.max(eintrag.seite + versatz, 1), seitenzahl),
+  }));
+}
+
+export function findeToc(seitentexte: string[]): TocRoheintrag[] {
   const tiefe = Math.min(TOC_SUCHTIEFE, seitentexte.length);
 
   for (let i = 0; i < tiefe; i++) {

@@ -18,7 +18,15 @@ export interface Seite {
 
 export interface TocEintrag {
   label: string;
+  /** Gedruckte Seitenzahl — was der Leser sieht. */
   seite: number;
+  /**
+   * 1-basierte Position in der Datei — das Sprungziel.
+   *
+   * Optional, weil Kataloge aus früheren Läufen das Feld nicht kennen; dann
+   * ist die gedruckte Seitenzahl das Beste, was zur Verfügung steht.
+   */
+  index?: number;
 }
 
 export interface Katalog {

@@ -22,29 +22,57 @@ export function maskiere(text: string): string {
   return text.replace(/[&<>"]/g, (z) => ERSATZ[z] ?? z);
 }
 
+const ALT_LAENGE = 110;
+
+/**
+ * Removes tags without a regular expression.
+ *
+ * `/<[^>]+>/g` degrades to quadratic time on input full of unclosed angle
+ * brackets. Page text comes from foreign PDFs, so a linear scan is the safer
+ * choice even though our own generator produces the markup.
+ */
+function ohneTags(html: string): string {
+  let text = '';
+  let imTag = false;
+
+  for (const zeichen of html) {
+    if (zeichen === '<') imTag = true;
+    else if (zeichen === '>') imTag = false;
+    else if (!imTag) text += zeichen;
+  }
+
+  return text;
+}
+
 /** Falls back to the page number when a page carries no text at all. */
 export function baueAltText(seite: Seite, gesamt: number): string {
-  const worte = seite.text_html
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const worte = ohneTags(seite.text_html).replace(/\s+/g, ' ').trim();
 
   if (worte.length === 0) return `Seite ${seite.nr} von ${gesamt} — ohne Text`;
+  if (worte.length <= ALT_LAENGE) return `Seite ${seite.nr} von ${gesamt}: ${worte}`;
 
-  const anfang = worte.slice(0, 110);
-  const gekuerzt = worte.length > 110 ? `${anfang.replace(/\s\S*$/, '')} …` : anfang;
-  return `Seite ${seite.nr} von ${gesamt}: ${gekuerzt}`;
+  // Am letzten vollständigen Wort abschneiden, nicht mitten hinein.
+  const anfang = worte.slice(0, ALT_LAENGE);
+  const letzteLuecke = anfang.lastIndexOf(' ');
+  const gekuerzt = letzteLuecke > 0 ? anfang.slice(0, letzteLuecke) : anfang;
+
+  return `Seite ${seite.nr} von ${gesamt}: ${gekuerzt} …`;
 }
 
 function baueInhaltsverzeichnis(katalog: Katalog): string {
   if (katalog.toc.length === 0) return '';
 
   const punkte = katalog.toc
-    .map(
-      (e) =>
-        `      <li><a href="#seite-${e.seite}">${maskiere(e.label)}</a> ` +
-        `<span class="seitenzahl">Seite ${e.seite}</span></li>`,
-    )
+    .map((e) => {
+      // Die Sprungmarken heißen nach der Dateiposition, das Inhaltsverzeichnis
+      // nennt die gedruckte Seitenzahl. Bei Katalogen mit unnummerierten
+      // Vorsatzblättern sind das zwei verschiedene Zahlen.
+      const ziel = e.index ?? e.seite;
+      return (
+        `      <li><a href="#seite-${ziel}">${maskiere(e.label)}</a> ` +
+        `<span class="seitenzahl">Seite ${e.seite}</span></li>`
+      );
+    })
     .join('\n');
 
   return `

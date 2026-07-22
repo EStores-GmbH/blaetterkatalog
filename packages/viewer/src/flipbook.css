@@ -224,6 +224,79 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* --- Inhaltsverzeichnis --------------------------------------------------- */
+
+.toc-knopf {
+  min-height: 44px;
+  padding: 0 0.9rem;
+  margin-right: 0.5rem;
+  font: inherit;
+  color: var(--akzent);
+  background: var(--grund);
+  border: 1px solid var(--rand);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toc-knopf:hover,
+.toc-knopf[aria-expanded='true'] {
+  background: var(--akzent);
+  color: #fff;
+  border-color: var(--akzent);
+}
+
+.toc {
+  border-top: 1px solid var(--rand);
+  background: var(--grund);
+  max-height: 40dvh;
+  overflow-y: auto;
+}
+
+.toc-liste {
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.toc-eintrag {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  /* 44 px Zielgröße, auch wenn der Text nur eine Zeile hoch ist. */
+  min-height: 44px;
+  padding: 0.5rem 1.5rem;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.toc-eintrag:hover {
+  background: #f2f6fa;
+  color: var(--akzent);
+}
+
+.toc-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-seite {
+  flex: 0 0 auto;
+  color: var(--gedaempft);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc-eintrag:hover .toc-seite {
+  color: inherit;
+}
+
 /* Für Screenreader vorhanden, visuell nicht. Nicht display:none — das würde
    die Ansage unterdrücken. */
 .nur-screenreader {

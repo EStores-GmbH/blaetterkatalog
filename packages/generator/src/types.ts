@@ -22,8 +22,15 @@ export interface Seite {
 
 export interface TocEintrag {
   label: string;
-  /** Page number as printed in the table of contents. */
+  /** Page number as printed — what the reader sees. */
   seite: number;
+  /**
+   * 1-based position in the file — where a click has to jump.
+   *
+   * Usually the same as `seite`, but catalogues with unnumbered front matter
+   * shift the two apart. Set by `versetzeToc` in extract.ts.
+   */
+  index: number;
 }
 
 export interface Quelle {

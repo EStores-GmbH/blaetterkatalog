@@ -70,6 +70,78 @@ async function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined)
   buehne.style.backgroundImage = `url("${sicher}")`;
 }
 
+/**
+ * Builds the clickable table of contents.
+ *
+ * Each entry is a real `<button>`, not a styled `<div>` — that gives keyboard
+ * operation, the right screen reader role and focus handling for free.
+ *
+ * The panel stays hidden entirely when the generator found no contents page.
+ * An empty "Inhalt" button that opens onto nothing is worse than no button.
+ */
+function richteInhaltsverzeichnisEin(katalog: Katalog, springeZu: (index: number) => void): void {
+  const knopf = document.getElementById('toc-knopf');
+  const panel = document.getElementById('toc');
+  const liste = document.getElementById('toc-liste');
+  if (!knopf || !panel || !liste) return;
+
+  if (katalog.toc.length === 0) return;
+
+  for (const eintrag of katalog.toc) {
+    // Ältere Kataloge kennen `index` noch nicht — dann ist die gedruckte
+    // Seitenzahl das Beste, was wir haben.
+    const ziel = eintrag.index ?? eintrag.seite;
+
+    const knopfEintrag = document.createElement('button');
+    knopfEintrag.type = 'button';
+    knopfEintrag.className = 'toc-eintrag';
+    knopfEintrag.innerHTML =
+      `<span class="toc-label"></span><span class="toc-seite"></span>`;
+    (knopfEintrag.querySelector('.toc-label') as HTMLElement).textContent = eintrag.label;
+    (knopfEintrag.querySelector('.toc-seite') as HTMLElement).textContent = `Seite ${eintrag.seite}`;
+    knopfEintrag.addEventListener('click', () => {
+      springeZu(ziel);
+      schliesse();
+    });
+
+    const punkt = document.createElement('li');
+    punkt.append(knopfEintrag);
+    liste.append(punkt);
+  }
+
+  function oeffne(): void {
+    panel!.hidden = false;
+    knopf!.setAttribute('aria-expanded', 'true');
+    liste!.querySelector<HTMLButtonElement>('.toc-eintrag')?.focus();
+  }
+
+  function schliesse(zurueckZumKnopf = false): void {
+    panel!.hidden = true;
+    knopf!.setAttribute('aria-expanded', 'false');
+    if (zurueckZumKnopf) knopf!.focus();
+  }
+
+  knopf.hidden = false;
+  knopf.addEventListener('click', () => {
+    if (panel.hidden) oeffne();
+    else schliesse(true);
+  });
+
+  // Escape schließt und gibt den Fokus zurück — sonst landet er im Nirgendwo.
+  panel.addEventListener('keydown', (ereignis: KeyboardEvent) => {
+    if (ereignis.key !== 'Escape') return;
+    ereignis.preventDefault();
+    schliesse(true);
+  });
+
+  document.addEventListener('click', (ereignis: MouseEvent) => {
+    if (panel.hidden) return;
+    const ziel = ereignis.target as Node;
+    if (panel.contains(ziel) || knopf.contains(ziel)) return;
+    schliesse();
+  });
+}
+
 function ladeBild(quelle: string): Promise<HTMLImageElement | undefined> {
   return new Promise((fertig) => {
     const bild = new Image();
@@ -217,6 +289,11 @@ async function start(): Promise<void> {
   flip.on('flip', melde);
   flip.on('changeOrientation', melde);
   melde();
+
+  richteInhaltsverzeichnisEin(katalog, (index) => {
+    flip.turnToPage(index - 1);
+    el.katalog.focus();
+  });
 
   // --- Bedienung, die die Engine nicht mitbringt --------------------------
 

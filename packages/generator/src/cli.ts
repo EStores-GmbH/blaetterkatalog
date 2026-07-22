@@ -10,7 +10,14 @@ import { access, constants, copyFile } from 'node:fs/promises';
 import { basename, extname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import { baueTextHtml, baueSuchindex, extrahiereAlleSeiten, findeToc } from './extract.ts';
+import {
+  baueSuchindex,
+  baueTextHtml,
+  extrahiereAlleSeiten,
+  findeSeitenversatz,
+  findeToc,
+  versetzeToc,
+} from './extract.ts';
 import { baueSlug, baueTitel, pruefsumme, schreibeKatalog } from './manifest.ts';
 import { leseInfo, pruefeWerkzeuge, WerkzeugFehlt } from './pdf-tools.ts';
 import { rendereSeiten, STANDARD_DPI } from './render.ts';
@@ -181,7 +188,8 @@ async function main(): Promise<void> {
   console.log('Text extrahieren …');
   const seitentexte = await extrahiereAlleSeiten(pdfPfad, info.seitenzahl);
   const suchindex = baueSuchindex(seitentexte);
-  const toc = findeToc(seitentexte);
+  const versatz = findeSeitenversatz(seitentexte);
+  const toc = versetzeToc(findeToc(seitentexte), versatz, info.seitenzahl);
 
   console.log(`  Text auf ${suchindex.length} von ${info.seitenzahl} Seiten`);
   console.log(
@@ -189,6 +197,12 @@ async function main(): Promise<void> {
       ? `  Inhaltsverzeichnis: ${toc.length} Einträge erkannt`
       : '  Kein Inhaltsverzeichnis erkannt — muss von Hand gepflegt werden',
   );
+  if (versatz !== 0) {
+    console.log(
+      `  Gedruckte Seitenzahlen sind um ${versatz > 0 ? '+' : ''}${versatz} versetzt — ` +
+        `Sprungziele entsprechend korrigiert`,
+    );
+  }
 
   // Ein Hintergrundbild wandert mit in die Ausgabe, damit der Katalogordner
   // für sich allein vollständig ist. In der katalog.json steht dann ein Pfad

@@ -49,11 +49,27 @@
 
     <div class="leiste">
       <p class="seitenstand" id="seitenstand">–</p>
+
       <p class="verweise">
+        <!-- Wird eingeblendet, sobald ein Inhaltsverzeichnis erkannt wurde. -->
+        <button
+          type="button"
+          id="toc-knopf"
+          class="toc-knopf"
+          aria-expanded="false"
+          aria-controls="toc"
+          hidden>Inhalt</button>
         <a href="/text/">Textfassung</a>
         <a id="download" href="#" download>PDF herunterladen</a>
       </p>
     </div>
+
+    <!-- Sprungziele des Katalogs. Die Einträge entstehen zur Laufzeit aus
+         katalog.json; jeder ist ein echter Knopf, damit Tastatur und
+         Screenreader ihn wie einen behandeln. -->
+    <nav id="toc" class="toc" aria-labelledby="toc-knopf" hidden>
+      <ol id="toc-liste" class="toc-liste"></ol>
+    </nav>
 
     <!-- Seitenwechsel werden hier angesagt. polite, damit die Ansage den
          Nutzer nicht beim Lesen unterbricht. -->

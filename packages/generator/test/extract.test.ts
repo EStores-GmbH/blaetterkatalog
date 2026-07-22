@@ -5,9 +5,12 @@ import {
   bereinigeText,
   baueTextHtml,
   findeToc,
+  findeSeitenversatz,
   findeTocAufSeite,
+  lesGedruckteSeitenzahl,
   maskiereHtml,
   normalisiereFuerSuche,
+  versetzeToc,
 } from '../src/extract.ts';
 
 describe('maskiereHtml', () => {
@@ -161,5 +164,75 @@ describe('bereinigeText', () => {
 
   test('lässt normalen Text unangetastet', () => {
     assert.equal(bereinigeText('Süße Momente – stilvoll'), 'Süße Momente – stilvoll');
+  });
+});
+
+describe('findeSeitenversatz', () => {
+  test('erkennt keinen Versatz, wenn gedruckte Zahl und Position übereinstimmen', () => {
+    const seiten = ['Titel', 'Inhalt\n\nSeite 2', 'Text\n\nSeite 3', 'Text\n\nSeite 4'];
+    assert.equal(findeSeitenversatz(seiten), 0);
+  });
+
+  test('erkennt unnummerierte Vorsatzblätter', () => {
+    // Zwei Blätter ohne Nummer, danach beginnt die gedruckte Zählung bei 1.
+    const seiten = ['Umschlag', 'Leer', 'Text\n\nSeite 1', 'Text\n\nSeite 2', 'Text\n\nSeite 3'];
+    assert.equal(findeSeitenversatz(seiten), 2);
+  });
+
+  test('lässt sich von einer einzelnen abweichenden Zahl nicht beirren', () => {
+    const seiten = ['A\n\nSeite 1', 'B\n\nSeite 2', 'C\n\nSeite 99', 'D\n\nSeite 4'];
+    assert.equal(findeSeitenversatz(seiten), 0);
+  });
+
+  test('nimmt 0 an, wenn keine Fußzeilen gefunden werden', () => {
+    assert.equal(findeSeitenversatz(['nur Fließtext', 'noch mehr']), 0);
+  });
+
+  test('braucht mindestens zwei übereinstimmende Funde', () => {
+    // Eine einzelne Zahl kann aus dem Fließtext stammen.
+    assert.equal(findeSeitenversatz(['A', 'B', 'Seite 1']), 0);
+  });
+});
+
+describe('versetzeToc', () => {
+  test('rechnet gedruckte Seitenzahlen in Dateipositionen um', () => {
+    const toc = [{ label: 'Vorwort', seite: 1 }, { label: 'Kapitel', seite: 10 }];
+    assert.deepEqual(versetzeToc(toc, 2, 50), [
+      { label: 'Vorwort', seite: 1, index: 3 },
+      { label: 'Kapitel', seite: 10, index: 12 },
+    ]);
+  });
+
+  test('lässt die angezeigte Seitenzahl unangetastet', () => {
+    // Der Leser sieht die gedruckte Zahl, gesprungen wird auf die Position.
+    const [eintrag] = versetzeToc([{ label: 'X', seite: 7 }], 3, 50);
+    assert.equal(eintrag?.seite, 7);
+    assert.equal(eintrag?.index, 10);
+  });
+
+  test('begrenzt auf den tatsächlichen Katalogumfang', () => {
+    const toc = [{ label: 'Zu weit', seite: 48 }, { label: 'Zu früh', seite: 1 }];
+    assert.deepEqual(versetzeToc(toc, 5, 46), [
+      { label: 'Zu weit', seite: 48, index: 46 },
+      { label: 'Zu früh', seite: 1, index: 6 },
+    ]);
+  });
+});
+
+describe('lesGedruckteSeitenzahl', () => {
+  test('liest die Fußzeile', () => {
+    assert.equal(lesGedruckteSeitenzahl('Text\n\nSeite 12'), 12);
+  });
+
+  test('versteht auch die englische Form', () => {
+    assert.equal(lesGedruckteSeitenzahl('Text\n\nPage 8'), 8);
+  });
+
+  test('ignoriert Zahlen im Fließtext', () => {
+    assert.equal(lesGedruckteSeitenzahl('Auf Seite 12 finden Sie mehr dazu.'), undefined);
+  });
+
+  test('liefert nichts, wenn keine Fußzeile da ist', () => {
+    assert.equal(lesGedruckteSeitenzahl('Nur Text'), undefined);
   });
 });
