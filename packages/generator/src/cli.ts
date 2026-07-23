@@ -210,14 +210,14 @@ async function main(): Promise<void> {
   let hintergrund = optionen.hintergrund;
   if (istBildpfad(hintergrund)) {
     const quelle = resolve(hintergrund);
+    const zielname = `hintergrund${extname(quelle).toLowerCase()}`;
     try {
-      await access(quelle, constants.R_OK);
+      // Direkt kopieren statt access() davor: copyFile wirft bei fehlender
+      // Datei ohnehin, und der Vorabcheck wäre nur eine zusätzliche Race.
+      await copyFile(quelle, join(zielVerzeichnis, zielname));
     } catch {
       throw new Error(`Hintergrundbild nicht gefunden oder nicht lesbar: ${quelle}`);
     }
-
-    const zielname = `hintergrund${extname(quelle).toLowerCase()}`;
-    await copyFile(quelle, join(zielVerzeichnis, zielname));
     hintergrund = zielname;
     console.log(`  Hintergrundbild übernommen: ${zielname}`);
   }

@@ -4,9 +4,8 @@
  *   text_html  → the accessible text route and what search engines index
  *   Suchindex  → plain text for client-side full-text search
  *
- * Both come from one `pdftotext` run per page. This is the reason the whole
- * project can afford an HTML text version at all: the text is extracted for
- * search anyway, the first draft of the brief merely threw it away.
+ * Both come from one `pdftotext` run per page — the text is extracted for
+ * search anyway, so the HTML text version costs nothing extra.
  */
 import { fuehreAus } from './pdf-tools.ts';
 import type { SuchindexEintrag, TocEintrag } from './types.ts';
@@ -138,7 +137,7 @@ export function findeTocAufSeite(seitentext: string): TocRoheintrag[] {
 
   for (const zeile of zeilen) {
     const inhalt = zeile.trim();
-    const nurZahl = /^\d{1,4}$/.test(inhalt);
+    const nurZahl = ZAHL.test(inhalt);
 
     if (nurZahl) {
       if (offenesLabel) {
@@ -231,7 +230,7 @@ function nurAufsteigend(eintraege: TocRoheintrag[]): TocRoheintrag[] {
 /** Zeilenweise statt per Sammelausdruck — der wäre auf langen Seiten anfällig. */
 const FUSSZEILE = /^(?:Seite|Page)[ \t]+(\d{1,4})$/;
 
-export function lesGedruckteSeitenzahl(seitentext: string): number | undefined {
+export function leseGedruckteSeitenzahl(seitentext: string): number | undefined {
   for (const zeile of seitentext.split('\n')) {
     const treffer = FUSSZEILE.exec(zeile.trim());
     if (treffer?.[1]) return Number(treffer[1]);
@@ -243,7 +242,7 @@ export function findeSeitenversatz(seitentexte: string[]): number {
   const stimmen = new Map<number, number>();
 
   seitentexte.forEach((text, i) => {
-    const gedruckt = lesGedruckteSeitenzahl(text);
+    const gedruckt = leseGedruckteSeitenzahl(text);
     if (gedruckt === undefined) return;
 
     const versatz = i + 1 - gedruckt;

@@ -29,6 +29,8 @@ const MIME: Record<string, string> = {
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
   '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.pdf': 'application/pdf',
 };
@@ -45,13 +47,11 @@ const ENGINE_WURZEL = resolve(VIEWER_WURZEL, '..', 'flip-engine');
 /**
  * Resolves a request path inside a root directory, or rejects it.
  *
- * Fails closed at every step rather than repairing the input. The previous
- * version normalised first, which silently rewrote `/../../package.json` into
- * a valid in-root path instead of refusing it — the request never escaped, but
- * an attack that gets answered with 200 teaches you nothing.
- *
- * Symlink resolution happens in `sendeDatei`: a link inside the root pointing
- * outside would pass a purely textual check.
+ * Fails closed at every step rather than repairing the input: a decoded `..`
+ * segment, a NUL byte or broken percent-encoding all return undefined. Repairing
+ * a traversal into a valid in-root path would answer an attack with 200 and hide
+ * it. Symlink resolution happens in `sendeDatei` — a link inside the root
+ * pointing outside would pass this purely textual check.
  */
 export function sichererPfad(wurzel: string, angefragt: string): string | undefined {
   let dekodiert: string;

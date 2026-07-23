@@ -13,6 +13,7 @@
  *
  * Nothing specified means the shipped default image.
  */
+import { HEX_FARBE } from './farbe.ts';
 
 /** Backdrops with a matching rule in flipbook.css. */
 export const HINTERGRUND_VORLAGEN = new Set(['holz', 'holz-dunkel', 'grau', 'dunkel']);
@@ -23,7 +24,6 @@ export const HINTERGRUND_STANDARD_BILD = '/assets/hintergrund-holz.jpg';
 /** Used when neither the catalogue nor the default image yields anything. */
 export const HINTERGRUND_NOTNAGEL = 'holz';
 
-const HEX = /^#[0-9a-fA-F]{6}$/;
 const BILDENDUNG = /\.(jpe?g|png|webp|avif)$/i;
 
 export type HintergrundArt = 'bild' | 'vorlage' | 'farbe';
@@ -63,7 +63,7 @@ export function waehleHintergrund(wunsch: string | undefined): HintergrundWahl {
     return { art: 'bild', kennung: 'bild', bild: HINTERGRUND_STANDARD_BILD, farbe: undefined };
   }
 
-  if (HEX.test(wert)) {
+  if (HEX_FARBE.test(wert)) {
     return { art: 'farbe', kennung: 'eigen', bild: undefined, farbe: wert };
   }
 

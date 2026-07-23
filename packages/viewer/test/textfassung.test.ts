@@ -1,19 +1,19 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { baueAltText, maskiere } from '../src/textfassung.ts';
+import { baueAltText, maskiereHtml } from '../src/textfassung.ts';
 import type { Seite } from '../src/katalog-typen.ts';
 
 function seite(text_html: string, nr = 3): Seite {
   return { nr, bild: 'pages/seite-03.jpg', breite: 100, hoehe: 140, text_html };
 }
 
-describe('maskiere', () => {
+describe('maskiereHtml', () => {
   test('entschärft die vier gefährlichen Zeichen', () => {
-    assert.equal(maskiere('<b>a & "b"</b>'), '&lt;b&gt;a &amp; &quot;b&quot;&lt;/b&gt;');
+    assert.equal(maskiereHtml('<b>a & "b"</b>'), '&lt;b&gt;a &amp; &quot;b&quot;&lt;/b&gt;');
   });
 
   test('lässt Umlaute unangetastet', () => {
-    assert.equal(maskiere('Süße Größe'), 'Süße Größe');
+    assert.equal(maskiereHtml('Süße Größe'), 'Süße Größe');
   });
 });
 
@@ -109,5 +109,25 @@ describe('baueTextfassung', () => {
     const html = baueTextfassung(katalog({ akzentfarbe: 'javascript:alert(1)' }));
     assert.match(html, /--akzent: #0057a0/);
     assert.doesNotMatch(html, /javascript:/);
+  });
+});
+
+describe('baueTextfassung — Attribut-Maskierung', () => {
+  test('maskiert einen Bildpfad, der aus dem Attribut ausbrechen wollte', () => {
+    const html = baueTextfassung(katalog({
+      seiten: [{ nr: 1, bild: 'x.jpg" onerror="alert(1)', breite: 10, hoehe: 10, text_html: '<p>a</p>' }],
+      seitenzahl: 1,
+    }));
+    assert.doesNotMatch(html, /onerror="alert/);
+    assert.match(html, /&quot;/);
+  });
+
+  test('lässt bei unsinnigen Maßen das Attribut leer statt Müll einzusetzen', () => {
+    const html = baueTextfassung(katalog({
+      seiten: [{ nr: 1, bild: 'a.jpg', breite: NaN, hoehe: 10, text_html: '<p>a</p>' }],
+      seitenzahl: 1,
+    }));
+    assert.match(html, /width=""/);
+    assert.doesNotMatch(html, /width="NaN"/);
   });
 });

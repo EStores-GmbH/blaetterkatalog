@@ -8,18 +8,21 @@
  * In phase 1 this moves into Astro as one route per page. The markup produced
  * here is the template for it.
  */
+import { sichereAkzentfarbe } from './farbe.ts';
 import type { Katalog, Seite } from './katalog-typen.ts';
 
-const ERSATZ: Record<string, string> = {
+// Gleicher Name wie maskiereHtml im Generator (extract.ts): identisches Konzept,
+// über die bewusst getrennte Paketgrenze hinweg absichtlich nicht geteilt.
+const HTML_ERSATZ: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
   '>': '&gt;',
   '"': '&quot;',
 };
 
-/** For values that reach us unescaped — title, chapter labels, colour. */
-export function maskiere(text: string): string {
-  return text.replace(/[&<>"]/g, (z) => ERSATZ[z] ?? z);
+/** For values that reach us unescaped — title, chapter labels, image paths. */
+export function maskiereHtml(text: string): string {
+  return text.replace(/[&<>"]/g, (z) => HTML_ERSATZ[z] ?? z);
 }
 
 const ALT_LAENGE = 110;
@@ -69,7 +72,7 @@ function baueInhaltsverzeichnis(katalog: Katalog): string {
       // Vorsatzblättern sind das zwei verschiedene Zahlen.
       const ziel = e.index ?? e.seite;
       return (
-        `      <li><a href="#seite-${ziel}">${maskiere(e.label)}</a> ` +
+        `      <li><a href="#seite-${ziel}">${maskiereHtml(e.label)}</a> ` +
         `<span class="seitenzahl">Seite ${e.seite}</span></li>`
       );
     })
@@ -98,19 +101,19 @@ function baueSeite(seite: Seite, gesamt: number): string {
 ${text}
           </div>
           <img
-            src="/katalog/${seite.bild}"
-            width="${seite.breite}"
-            height="${seite.hoehe}"
+            src="/katalog/${maskiereHtml(seite.bild)}"
+            width="${Number(seite.breite) || ''}"
+            height="${Number(seite.hoehe) || ''}"
             loading="lazy"
             decoding="async"
-            alt="${maskiere(baueAltText(seite, gesamt))}">
+            alt="${maskiereHtml(baueAltText(seite, gesamt))}">
         </div>
       </section>`;
 }
 
 export function baueTextfassung(katalog: Katalog): string {
-  const titel = maskiere(katalog.titel);
-  const farbe = /^#[0-9a-fA-F]{6}$/.test(katalog.akzentfarbe) ? katalog.akzentfarbe : '#0057a0';
+  const titel = maskiereHtml(katalog.titel);
+  const farbe = sichereAkzentfarbe(katalog.akzentfarbe);
 
   const seiten = katalog.seiten.map((s) => baueSeite(s, katalog.seitenzahl)).join('\n');
 
@@ -132,7 +135,7 @@ export function baueTextfassung(katalog: Katalog): string {
     <p class="hinweis">
       Textfassung — alle Inhalte als Text, ohne Blätterfunktion.
       <a href="/">Zum Blätterkatalog</a> ·
-      <a href="/katalog/${maskiere(katalog.download_pdf)}" download>PDF herunterladen</a>
+      <a href="/katalog/${maskiereHtml(katalog.download_pdf)}" download>PDF herunterladen</a>
     </p>
   </header>
 
@@ -142,7 +145,7 @@ ${seiten}
   </main>
 
   <footer>
-    <p>${katalog.seitenzahl} Seiten · erzeugt am ${maskiere(katalog.erzeugt_am.slice(0, 10))}</p>
+    <p>${katalog.seitenzahl} Seiten · erzeugt am ${maskiereHtml(katalog.erzeugt_am.slice(0, 10))}</p>
   </footer>
 </body>
 </html>

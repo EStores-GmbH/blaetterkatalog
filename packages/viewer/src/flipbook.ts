@@ -9,6 +9,7 @@
  * See packages/flip-engine/HERKUNFT.md, PATCH 3.
  */
 import { ladeEngine } from './engine.ts';
+import { sichereAkzentfarbe } from './farbe.ts';
 import { HINTERGRUND_NOTNAGEL, bildDarstellung, waehleHintergrund } from './hintergrund.ts';
 import type { Katalog } from './katalog-typen.ts';
 import { baueAltText } from './textfassung.ts';
@@ -92,13 +93,18 @@ function richteInhaltsverzeichnisEin(katalog: Katalog, springeZu: (index: number
     // Seitenzahl das Beste, was wir haben.
     const ziel = eintrag.index ?? eintrag.seite;
 
+    const label = document.createElement('span');
+    label.className = 'toc-label';
+    label.textContent = eintrag.label;
+
+    const seite = document.createElement('span');
+    seite.className = 'toc-seite';
+    seite.textContent = `Seite ${eintrag.seite}`;
+
     const knopfEintrag = document.createElement('button');
     knopfEintrag.type = 'button';
     knopfEintrag.className = 'toc-eintrag';
-    knopfEintrag.innerHTML =
-      `<span class="toc-label"></span><span class="toc-seite"></span>`;
-    (knopfEintrag.querySelector('.toc-label') as HTMLElement).textContent = eintrag.label;
-    (knopfEintrag.querySelector('.toc-seite') as HTMLElement).textContent = `Seite ${eintrag.seite}`;
+    knopfEintrag.append(label, seite);
     knopfEintrag.addEventListener('click', () => {
       springeZu(ziel);
       schliesse();
@@ -240,7 +246,7 @@ async function start(): Promise<void> {
   document.title = `${katalog.titel} — Blätterkatalog`;
   el.titel.textContent = katalog.titel;
   el.download.href = `/katalog/${katalog.download_pdf}`;
-  document.documentElement.style.setProperty('--akzent', katalog.akzentfarbe);
+  document.documentElement.style.setProperty('--akzent', sichereAkzentfarbe(katalog.akzentfarbe));
   // Nicht abgewartet: Der Katalog soll nicht auf das Hintergrundbild warten.
   void setzeHintergrund(el.buehne, katalog.hintergrund);
 
@@ -351,10 +357,19 @@ async function start(): Promise<void> {
 
 start().catch((fehler: unknown) => {
   const meldung = fehler instanceof Error ? fehler.message : String(fehler);
-  document.body.insertAdjacentHTML(
-    'afterbegin',
-    `<p class="fehler" role="alert">Der Katalog konnte nicht geladen werden: ${meldung}
-     <a href="/text/">Zur Textfassung</a></p>`,
-  );
+
+  // Elemente bauen statt insertAdjacentHTML: `meldung` kann in Phase 1 aus einer
+  // Storyblok/CDN-Antwort stammen; textContent kann keinen Markup einschleusen.
+  const box = document.createElement('p');
+  box.className = 'fehler';
+  box.setAttribute('role', 'alert');
+  box.textContent = `Der Katalog konnte nicht geladen werden: ${meldung} `;
+
+  const zurText = document.createElement('a');
+  zurText.href = '/text/';
+  zurText.textContent = 'Zur Textfassung';
+  box.append(zurText);
+
+  document.body.prepend(box);
   console.error(fehler);
 });

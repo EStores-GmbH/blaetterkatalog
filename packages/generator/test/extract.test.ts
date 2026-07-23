@@ -7,7 +7,7 @@ import {
   findeToc,
   findeSeitenversatz,
   findeTocAufSeite,
-  lesGedruckteSeitenzahl,
+  leseGedruckteSeitenzahl,
   maskiereHtml,
   normalisiereFuerSuche,
   versetzeToc,
@@ -219,20 +219,20 @@ describe('versetzeToc', () => {
   });
 });
 
-describe('lesGedruckteSeitenzahl', () => {
+describe('leseGedruckteSeitenzahl', () => {
   test('liest die Fußzeile', () => {
-    assert.equal(lesGedruckteSeitenzahl('Text\n\nSeite 12'), 12);
+    assert.equal(leseGedruckteSeitenzahl('Text\n\nSeite 12'), 12);
   });
 
   test('versteht auch die englische Form', () => {
-    assert.equal(lesGedruckteSeitenzahl('Text\n\nPage 8'), 8);
+    assert.equal(leseGedruckteSeitenzahl('Text\n\nPage 8'), 8);
   });
 
   test('ignoriert Zahlen im Fließtext', () => {
-    assert.equal(lesGedruckteSeitenzahl('Auf Seite 12 finden Sie mehr dazu.'), undefined);
+    assert.equal(leseGedruckteSeitenzahl('Auf Seite 12 finden Sie mehr dazu.'), undefined);
   });
 
   test('liefert nichts, wenn keine Fußzeile da ist', () => {
-    assert.equal(lesGedruckteSeitenzahl('Nur Text'), undefined);
+    assert.equal(leseGedruckteSeitenzahl('Nur Text'), undefined);
   });
 });
