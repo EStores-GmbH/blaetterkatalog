@@ -7,7 +7,7 @@
  *   2. The longest edge stays at or below that ceiling, so the resolution is
  *      derived from the page size instead of being hard-coded.
  */
-import { mkdir, readdir } from 'node:fs/promises';
+import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fuehreAus } from './pdf-tools.ts';
 import type { Ausrichtung } from './types.ts';
@@ -71,6 +71,11 @@ export async function rendereSeiten(
 
   await mkdir(zielVerzeichnis, { recursive: true });
 
+  // Alte Seitenbilder eines früheren Laufs entfernen. Sonst zählt readdir()
+  // unten sie mit — hatte der vorige Katalog mehr Seiten, bricht der Generator
+  // wegen falscher Bildanzahl ab oder übernimmt veraltete Seiten.
+  await entferneAlteSeiten(zielVerzeichnis);
+
   // pdftoppm appends "-<n>.jpg" and pads the number to the page count's width.
   const praefix = join(zielVerzeichnis, 'seite');
   await fuehreAus('pdftoppm', [
@@ -83,9 +88,7 @@ export async function rendereSeiten(
     praefix,
   ]);
 
-  const dateien = (await readdir(zielVerzeichnis))
-    .filter((d) => d.startsWith('seite-') && d.endsWith('.jpg'))
-    .sort(nachSeitennummer);
+  const dateien = (await readdir(zielVerzeichnis)).filter(istSeitenbild).sort(nachSeitennummer);
 
   if (dateien.length === 0) {
     throw new Error(
@@ -101,9 +104,23 @@ export async function rendereSeiten(
   };
 }
 
+/** Removes leftover "seite-*.jpg" from an earlier run. Ignores everything else. */
+async function entferneAlteSeiten(verzeichnis: string): Promise<void> {
+  const vorhanden = await readdir(verzeichnis).catch(() => [] as string[]);
+  await Promise.all(
+    vorhanden
+      .filter(istSeitenbild)
+      .map((datei) => rm(join(verzeichnis, datei), { force: true })),
+  );
+}
+
 /** "seite-9.jpg" must sort before "seite-10.jpg" — plain string sort would not. */
 export function nachSeitennummer(a: string, b: string): number {
   return nummerAus(a) - nummerAus(b);
+}
+
+export function istSeitenbild(dateiname: string): boolean {
+  return dateiname.startsWith('seite-') && dateiname.endsWith('.jpg');
 }
 
 function nummerAus(dateiname: string): number {

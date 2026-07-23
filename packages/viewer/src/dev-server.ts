@@ -138,7 +138,10 @@ export async function starte(port: number, katalogVerzeichnis: string): Promise<
     })();
   });
 
-  await new Promise<void>((fertig) => server.listen(port, fertig));
+  // Ausdrücklich nur an localhost binden. Ohne Host-Angabe lauscht Node auf
+  // allen Netzwerk-Schnittstellen — dann läge der Katalog samt PDF und
+  // Textfassung für jeden im selben WLAN offen. Es ist ein Entwicklungsserver.
+  await new Promise<void>((fertig) => server.listen(port, '127.0.0.1', fertig));
 
   console.log(`\nKatalog:  ${katalog.titel}`);
   console.log(`Seiten:   ${katalog.seitenzahl} (${katalog.ausrichtung}format)`);

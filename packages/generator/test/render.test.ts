@@ -5,6 +5,7 @@ import {
   begrenzeDpi,
   bestimmeAusrichtung,
   nachSeitennummer,
+  istSeitenbild,
   pixelMasse,
 } from '../src/render.ts';
 
@@ -83,5 +84,20 @@ describe('nachSeitennummer', () => {
       'seite-09.jpg',
       'seite-10.jpg',
     ]);
+  });
+});
+
+describe('istSeitenbild', () => {
+  test('erkennt gerenderte Seitenbilder', () => {
+    assert.equal(istSeitenbild('seite-01.jpg'), true);
+    assert.equal(istSeitenbild('seite-123.jpg'), true);
+  });
+
+  test('lässt andere Dateien im Ordner in Ruhe', () => {
+    // Hintergrundbild, PDF, Manifest — nichts davon darf beim Aufräumen fallen.
+    assert.equal(istSeitenbild('hintergrund.jpg'), false);
+    assert.equal(istSeitenbild('original.pdf'), false);
+    assert.equal(istSeitenbild('katalog.json'), false);
+    assert.equal(istSeitenbild('thumb-seite-1.png'), false);
   });
 });

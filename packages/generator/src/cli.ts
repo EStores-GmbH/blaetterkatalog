@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-strip-types
+#!/usr/bin/env -S node --experimental-strip-types
 /**
  * katalog-build — turns a PDF into page images, page text, a table of contents
  * and a search index.
@@ -221,6 +221,11 @@ async function main(): Promise<void> {
     hintergrund = zielname;
     console.log(`  Hintergrundbild übernommen: ${zielname}`);
   }
+
+  // Die Quell-PDF wandert mit in die Ausgabe — sonst zeigt der Download-Link
+  // in der katalog.json auf eine Datei, die im Katalogordner gar nicht liegt.
+  const pdfName = basename(pdfPfad);
+  await copyFile(pdfPfad, join(zielVerzeichnis, pdfName));
 
   const seiten: Seite[] = bilder.dateien.map((datei, i) => ({
     nr: i + 1,

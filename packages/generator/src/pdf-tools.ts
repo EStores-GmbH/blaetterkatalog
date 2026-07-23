@@ -76,22 +76,38 @@ export interface PdfInfo {
 }
 
 export async function leseInfo(pdfPfad: string): Promise<PdfInfo> {
-  const { stdout } = await execFileAsync('pdfinfo', [pdfPfad], {
+  // -enc UTF-8: pdfinfo gibt sonst Latin1 aus, Node dekodiert stdout aber als
+  // UTF-8 — ein Titel mit Umlauten käme sonst verstümmelt in der katalog.json an.
+  const { stdout } = await execFileAsync('pdfinfo', ['-enc', 'UTF-8', pdfPfad], {
     maxBuffer: 1024 * 1024,
   });
 
+  try {
+    return werteAusPdfInfo(stdout);
+  } catch (fehler) {
+    const grund = fehler instanceof Error ? fehler.message : String(fehler);
+    throw new Error(`${grund} für ${pdfPfad}`);
+  }
+}
+
+/**
+ * Parses pdfinfo output. Split from leseInfo so it can be tested against fixed
+ * output — including the fail-closed encryption gate, on which cli.ts relies
+ * to reject copy-protected PDFs.
+ */
+export function werteAusPdfInfo(stdout: string): PdfInfo {
   const feld = (name: string): string | undefined =>
-    stdout.match(new RegExp(`^${name}:\\s*(.+)$`, 'm'))?.[1]?.trim();
+    stdout.match(new RegExp(`^${name}:[ \\t]*(.+)$`, 'm'))?.[1]?.trim();
 
   const seitenzahl = Number(feld('Pages'));
   if (!Number.isInteger(seitenzahl) || seitenzahl < 1) {
-    throw new Error(`pdfinfo liefert keine brauchbare Seitenzahl für ${pdfPfad}`);
+    throw new Error('pdfinfo liefert keine brauchbare Seitenzahl');
   }
 
   // "595.276 x 841.89 pts (A4)"
   const masse = feld('Page size')?.match(/([\d.]+)\s*x\s*([\d.]+)\s*pts/);
   if (!masse?.[1] || !masse[2]) {
-    throw new Error(`pdfinfo liefert kein lesbares Seitenformat für ${pdfPfad}`);
+    throw new Error('pdfinfo liefert kein lesbares Seitenformat');
   }
 
   return {
@@ -100,6 +116,7 @@ export async function leseInfo(pdfPfad: string): Promise<PdfInfo> {
     hoehePt: Number(masse[2]),
     titel: feld('Title'),
     getaggt: feld('Tagged') === 'yes',
+    // Fail-closed: fehlt das Feld, gilt das PDF als verschlüsselt.
     verschluesselt: feld('Encrypted') !== 'no',
   };
 }

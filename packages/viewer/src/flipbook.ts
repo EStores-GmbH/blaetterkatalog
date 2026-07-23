@@ -162,6 +162,18 @@ function magAnimation(): boolean {
 }
 
 /**
+ * Flip duration in milliseconds.
+ *
+ * NOT 0 for reduced motion: the engine rejects `flippingTime <= 0` in its
+ * constructor with "Invalid flipping time", which would leave those users —
+ * the very ones the setting protects — with no catalogue at all. 1 ms is
+ * effectively instant and passes validation.
+ */
+function blaetterDauer(): number {
+  return magAnimation() ? 700 : 1;
+}
+
+/**
  * Builds one page element per catalogue page.
  *
  * The image carries `data-src` rather than `src` — nothing is fetched until
@@ -261,7 +273,7 @@ async function start(): Promise<void> {
     showCover: true,
     usePortrait: true,
     mobileScrollSupport: true,
-    flippingTime: magAnimation() ? 700 : 0,
+    flippingTime: blaetterDauer(),
     maxShadowOpacity: 0.5,
     drawShadow: true,
     useMouseEvents: true,
@@ -329,7 +341,12 @@ async function start(): Promise<void> {
   if (document.activeElement === document.body) el.katalog.focus();
 
   // PATCH 1 wirkt nur, wenn destroy() auch aufgerufen wird.
-  window.addEventListener('pagehide', () => flip.destroy(), { once: true });
+  // Aber NICHT bei event.persisted: Dann legt der Browser die Seite in den
+  // Vor-/Zurück-Zwischenspeicher und zeigt sie später unverändert wieder.
+  // Ein destroy() dort hinterließe beim Zurückblättern einen leeren Viewer.
+  window.addEventListener('pagehide', (ereignis: PageTransitionEvent) => {
+    if (!ereignis.persisted) flip.destroy();
+  });
 }
 
 start().catch((fehler: unknown) => {

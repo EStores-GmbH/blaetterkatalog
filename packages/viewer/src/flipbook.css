@@ -70,6 +70,10 @@ body {
    Abgezogen werden Kopfzeile, Bedienhinweis und Leiste. */
 /* ---------------------------------------------------------------------------
    Untergrund
+   Die Vorlagennamen (holz, holz-dunkel, grau, dunkel) müssen mit
+   src/hintergrund.ts und generator/src/cli.ts übereinstimmen. Ein TS-Test
+   (test/vorlagen-drift.test.ts) hält die beiden Code-Seiten deckungsgleich,
+   diese CSS-Datei kann er aber nicht prüfen — bei Änderungen hier mitdenken.
    Kommt aus katalog.json (Feld `hintergrund`) und wird als data-Attribut an
    die Bühne geschrieben. Bewusst als CSS statt als Bilddatei: kein Binärdatei
    im Repo, keine Lizenzfrage, kein zusätzlicher Download — und die Maserung

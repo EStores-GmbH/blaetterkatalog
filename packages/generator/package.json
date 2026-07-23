@@ -8,6 +8,6 @@
     "katalog-build": "./src/cli.ts"
   },
   "engines": {
-    "node": ">=22.6"
+    "node": ">=22.13"
   }
 }
