@@ -9,7 +9,8 @@ Ersetzt das kommerzielle „Flip PDF Plus Pro" durch einen eigenen, CI-konformen
 - **Zweck:** Kataloge ohne manuelles Hochladen und Einbetten veröffentlichen — PDF rein,
   fertiger Katalog raus. Volle Kontrolle über Gestaltung, Barrierefreiheit und Auffindbarkeit.
 - **Profil:** headless-cms-site
-- **Status:** in Entwicklung — Phase 0 (Prototyp)
+- **Status:** Phase 0 (POC) abgeschlossen — Generator + Viewer lokal lauffähig,
+  noch ohne Storyblok/Astro. **Einstieg für Weiterbau: `docs/POC-STATUS.md`.**
 
 ## Leitprinzip
 
@@ -33,24 +34,29 @@ Der Text fällt beim Erzeugen des Suchindex ohnehin an.
 
 ```bash
 brew install poppler            # Systemvoraussetzung: pdftoppm, pdftotext, pdfinfo
-cp .env.example .env.local      # Storyblok-Tokens eintragen
-npm install
+npm install                     # nur Dev-Werkzeuge, null Laufzeit-Abhängigkeiten
+
+npm run katalog-build -- fixtures/<katalog>.pdf   # PDF → out/<slug>/
+npm run viewer                                    # http://localhost:4321/
 ```
 
-Der Generator und das Frontend entstehen in Phase 0 — bis dahin gibt es keine Start-Befehle.
-Aktueller Stand und nächste Schritte: `docs/BACKLOG.md`.
+Weiteres: `npm test` · `npm run type-check` · `npm run katalog-build -- --hilfe`.
+Vollständiger Ist-Zustand und Übergabe: **`docs/POC-STATUS.md`**.
 
 ## Projektstruktur
 
 ```text
-packages/generator/    → PDF → Bilder, Text, katalog.json
-packages/flip-engine/  → einvendorter StPageFlip-Fork + eigene Patches
-packages/viewer/       → Astro-Block, Viewer-Island, HTML-Textrouten
+packages/generator/    → PDF → Bilder, Text, katalog.json        (README im Ordner)
+packages/viewer/       → Blätterkatalog + HTML-Textfassung        (README im Ordner)
+packages/flip-engine/  → einvendorter StPageFlip-Fork + Patches   (HERKUNFT.md)
 fixtures/              → Test-PDFs (gitignored)
 out/                   → Generator-Ausgabe (gitignored)
-docs/                  → Projektbrief, Architektur, Roadmap, Compliance
+docs/                  → POC-STATUS, Projektbrief, Architektur, Roadmap, Compliance
 decisions/             → Entscheidungs-Log + ADRs
 ```
+
+> Astro-Frontend und Storyblok-Anbindung entstehen in Phase 1 — siehe
+> `docs/POC-STATUS.md`, Abschnitt „Der Weg vom POC zu Phase 1".
 
 ## Entwicklung
 
