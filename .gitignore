@@ -31,6 +31,11 @@ build/
 .nuxt/
 out/
 
+# Blätterkatalog — Eingabe und Ausgabe des Generators
+# Test-PDFs und gerenderte Seitenbilder sind gross und gehoeren nicht in die Historie.
+fixtures/
+!fixtures/.gitkeep
+
 # Test coverage
 coverage/
 .nyc_output/

@@ -9,7 +9,8 @@
     }
   },
   "enabledPlugins": {
-    "estores-core@estores": true
+    "estores-core@estores": true,
+    "estores-web@estores": true
   },
   "permissions": {
     "deny": [

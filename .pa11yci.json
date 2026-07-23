@@ -1,4 +1,14 @@
 {
-  "defaults": { "standard": "WCAG2AA", "timeout": 30000 },
-  "urls": ["http://localhost:3000/"]
+  "_hinweis": "Zielnorm WCAG 2.2 AA (siehe decisions/log.md). Die Textrouten MÜSSEN grün sein — sie sind die barrierefreie Alternativfassung. Der Viewer wird zusätzlich manuell mit Tastatur und NVDA geprüft; automatisierte Tests decken nur rund 30 % der Kriterien ab.",
+  "defaults": {
+    "standard": "WCAG2AA",
+    "timeout": 30000,
+    "chromeLaunchConfig": { "args": ["--no-sandbox"] }
+  },
+  "urls": [
+    "http://localhost:4321/kataloge/",
+    "http://localhost:4321/kataloge/beispiel/text/",
+    "http://localhost:4321/kataloge/beispiel/seite-1/",
+    "http://localhost:4321/kataloge/beispiel/"
+  ]
 }

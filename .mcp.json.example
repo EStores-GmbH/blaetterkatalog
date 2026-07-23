@@ -1,20 +1,10 @@
 {
-  "_hinweis": "Kopiere zu .mcp.json (gitignored) und trage echte Tokens via Env ein. Nur benötigte Server behalten.",
+  "_hinweis": "Kopiere zu .mcp.json (gitignored) und trage echte Tokens via Env ein.",
   "mcpServers": {
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest"
-      ],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
-      }
-    },
     "storyblok": {
       "type": "http",
       "url": "https://mcp.labs.storyblok.com",
-      "_hinweis": "EU-Region für DSGVO"
+      "_hinweis": "EU-Region für DSGVO. Content-Types, Stories und Assets abfragen."
     },
     "github": {
       "command": "npx",
@@ -26,24 +16,13 @@
         "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     },
-    "dataforseo": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "dataforseo-mcp-server"
-      ],
-      "env": {
-        "DATAFORSEO_LOGIN": "${DATAFORSEO_LOGIN}",
-        "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"
-      }
-    },
     "playwright": {
       "command": "npx",
       "args": [
         "-y",
         "@playwright/mcp@latest"
       ],
-      "_hinweis": "E2E-Tests und Browser-Automatisierung (nur Web-Profile)"
+      "_hinweis": "E2E-Tests, Tastatur-Durchläufe und Screenshots des Viewers"
     },
     "context7": {
       "command": "npx",
@@ -51,7 +30,7 @@
         "-y",
         "@upstash/context7-mcp"
       ],
-      "_hinweis": "Aktuelle Library-Dokumentation direkt im Kontext"
+      "_hinweis": "Aktuelle Doku zu Astro, StPageFlip und Storyblok direkt im Kontext"
     }
   }
 }

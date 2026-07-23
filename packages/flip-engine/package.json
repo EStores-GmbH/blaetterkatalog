@@ -1,0 +1,16 @@
+{
+  "name": "@blaetterkatalog/flip-engine",
+  "version": "2.0.7-fork.1",
+  "private": true,
+  "description": "Einvendorter StPageFlip-Fork (MIT, Nodlik) mit eigenen Patches — siehe HERKUNFT.md",
+  "type": "module",
+  "main": "./src/PageFlip.ts",
+  "exports": {
+    ".": "./src/PageFlip.ts",
+    "./style.css": "./src/Style/stPageFlip.css"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13"
+  }
+}

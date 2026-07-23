@@ -1,0 +1,30 @@
+{
+  // Eigene Konfiguration für den einvendorten Fremdcode.
+  //
+  // StPageFlip wurde ohne Strict-Modus geschrieben (siehe HERKUNFT.md). Den
+  // nachträglich zu erzwingen hieße, ~4.000 Zeilen Fremdcode umzubauen — und
+  // jede Änderung erschwert den Abgleich mit dem Upstream-Stand. Stattdessen
+  // gilt hier die Strenge des Originals; unser eigener Code läuft weiterhin
+  // unter der strengen Wurzel-Konfiguration.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+
+    // Node führt die Dateien direkt aus — nichts darf übersetzt werden müssen.
+    // Diese Option hält die sieben umgewandelten const-enum in Schach.
+    "erasableSyntaxOnly": true,
+
+    "noImplicitAny": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

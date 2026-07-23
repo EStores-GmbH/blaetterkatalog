@@ -26,7 +26,15 @@ jobs:
       - uses: actions/checkout@v7
       - id: check
         run: |
-          echo "node=$([ -f package.json ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+          # Auf das BUILD-SCRIPT prüfen, nicht auf die package.json: die existiert
+          # bereits für lefthook, ohne dass ein Frontend gebaut werden kann.
+          # Alle drei Gates rufen `npm run build` — ohne Script bricht das ab.
+          if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts?.build ? 0 : 1)"; then
+            echo "node=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "node=no" >> "$GITHUB_OUTPUT"
+            echo "Kein build-Script in package.json — Web-Quality-Gates übersprungen."
+          fi
           echo "sizelimit=$([ -f .size-limit.json ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
 
   lighthouse:

@@ -2,13 +2,29 @@
   "name": "blaetterkatalog",
   "version": "1.0.0",
   "private": true,
-  "description": "Blätterkatalog",
+  "description": "Blätterkatalog-Generator: PDF → interaktiver Page-Flip-Katalog mit HTML-Textfassung, veröffentlicht in Storyblok, ausgeliefert via Astro",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EStores-GmbH/blaetterkatalog.git"
   },
   "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "katalog-build": "node --experimental-strip-types packages/generator/src/cli.ts",
+    "test": "node --experimental-strip-types --test packages/*/test/*.test.ts",
+    "test:coverage": "node --experimental-strip-types --experimental-test-coverage --test packages/*/test/*.test.ts",
+    "viewer": "node --experimental-strip-types packages/viewer/src/dev-server.ts",
+    "type-check": "tsc --noEmit && tsc --noEmit -p packages/flip-engine && tsc --noEmit -p packages/viewer"
+  },
   "devDependencies": {
-    "lefthook": "^2.1.10"
+    "@types/node": "^22.15.0",
+    "lefthook": "^2.1.10",
+    "typescript": "^5.9.0"
   }
 }

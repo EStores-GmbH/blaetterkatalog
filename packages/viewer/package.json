@@ -1,0 +1,10 @@
+{
+  "name": "@blaetterkatalog/viewer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Phase-0-Viewer: Blätterkatalog aus katalog.json, mit HTML-Textfassung",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  }
+}

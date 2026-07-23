@@ -10,10 +10,32 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  # Ohne Schlüssel würde das Review bei jedem PR rot laufen — ein fehlendes
+  # Secret ist aber eine Einrichtungslücke, kein Fehler im Code. Der
+  # `secrets`-Kontext ist im Job-`if` nicht verfügbar, deshalb dieser
+  # Erkennungs-Job mit Step-Output (siehe estores-marketplace#3).
+  schluessel:
+    name: API-Schlüssel vorhanden?
+    runs-on: ubuntu-latest
+    outputs:
+      vorhanden: ${{ steps.pruefe.outputs.vorhanden }}
+    steps:
+      - id: pruefe
+        env:
+          SCHLUESSEL: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$SCHLUESSEL" ]; then
+            echo "vorhanden=ja" >> "$GITHUB_OUTPUT"
+          else
+            echo "vorhanden=nein" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY ist nicht gesetzt — das Claude-Review wird übersprungen. Einrichten unter Settings → Secrets and variables → Actions."
+          fi
+
   review:
+    needs: schluessel
     # Bot-PRs (Dependabot & Co.) überspringen — Versions-Bumps brauchen kein
     # KI-Review, und die Action verweigert Bot-Actors ohnehin (spart API-Kosten).
-    if: github.event.pull_request.user.type != 'Bot'
+    if: needs.schluessel.outputs.vorhanden == 'ja' && github.event.pull_request.user.type != 'Bot'
     runs-on: ubuntu-latest
     permissions:
       contents: read

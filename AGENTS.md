@@ -4,6 +4,7 @@
 > CLAUDE.md importiert diese Datei — Regeln NUR hier pflegen, nie doppelt.
 
 ## Pflicht vor jeder Aktion
+
 1. CLAUDE.md lesen (Projekt-Profil, Stack, Befehle)
 2. docs/ARCHITECTURE.md lesen
 3. context/current-priorities.md lesen
@@ -12,6 +13,7 @@
 6. docs/COMPLIANCE.md beachten (Pflicht-Skills je Profil)
 
 ## Was du NICHT tun darfst
+
 > Diese Regeln werden zusätzlich technisch erzwungen (Plugin-Hooks,
 > `.claude/settings.json` → permissions.deny, lefthook, CI).
 
@@ -27,20 +29,27 @@
 - Code schreiben ohne vorher den Plan erklärt zu haben
 
 ## Backlog
+
 - Einzige Task-Quelle: `docs/BACKLOG.md` (committed, Format siehe Dateikopf)
 - Vor neuen Features: dort auf Abhängigkeiten prüfen; nach Abschluss Status aktualisieren
 
 ## Branching
+
 - `main` → Production (protected) · `staging` → Staging · `develop` → Entwicklung
 - Alle Änderungen auf Feature-Branch: `feature/[ticket-id]-[name]`
 - Hotfixes: `hotfix/[ticket-id]-[name]`
 
 ## Commit-Format
+
 `type(scope): beschreibung` — Conventional Commits
 Typen: feat / fix / docs / style / refactor / perf / test / build / ci / chore
 
 ## Kommunikation
-- Immer auf Deutsch antworten (Code-Kommentare auf Englisch)
+
+- Immer auf Deutsch antworten. **Code-Kommentare auf Deutsch** (Bezeichner sind
+  ohnehin deutsch; der Nutzer liest den Code). Ausnahme: einvendorter Fremdcode
+  (`packages/flip-engine/`) — dort passen sich unsere `PATCH`-Kommentare der
+  englischen Sprache des Upstreams an.
 - Vor größeren Änderungen: Plan erklären und Bestätigung abwarten
 - Technische Begriffe immer kurz erklären (Nutzer ist Nicht-Entwickler)
 - Bei Unklarheiten: fragen statt raten

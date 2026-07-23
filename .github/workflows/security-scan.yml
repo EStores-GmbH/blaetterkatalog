@@ -15,10 +15,18 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # gitleaks braucht die Historie
-      # Nutzt automatisch die .gitleaks.toml im Repo — dieselbe Config wie lefthook lokal.
-      - uses: gitleaks/gitleaks-action@v2
+      # Das Programm gitleaks direkt statt gitleaks/gitleaks-action@v2:
+      # Die Action verlangt für Organisationen einen kostenpflichtigen Lizenz-
+      # schlüssel ("[EStores-GmbH] is an organization. License key is required."),
+      # das Programm selbst ist frei. Gleiche .gitleaks.toml wie lokal in lefthook.
+      - name: gitleaks
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz gitleaks
+          ./gitleaks detect --no-banner --redact --config .gitleaks.toml
 
   dependency-audit:
     name: Dependency Audit
@@ -41,6 +49,9 @@ jobs:
     permissions:
       security-events: write
       contents: read
+      # CodeQL v4 liest den Workflow-Lauf über die API. Ohne dieses Recht
+      # bricht es mit "Resource not accessible by integration" ab.
+      actions: read
     steps:
       - uses: actions/checkout@v7
       # CodeQL schlägt fehl, wenn es keinen Code der Zielsprache gibt —

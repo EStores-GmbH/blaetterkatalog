@@ -14,10 +14,12 @@ Was ist der Hintergrund und die Ausgangssituation?]
 ## Optionen
 
 ### Option A: [Name]
+
 - ✅ [Vorteil]
 - ❌ [Nachteil]
 
 ### Option B: [Name]
+
 - ✅ [Vorteil]
 - ❌ [Nachteil]
 
@@ -32,9 +34,11 @@ Wir wählen **Option [X]**.
 ## Konsequenzen
 
 **Positiv:**
+
 - [Was wird besser]
 
 **Negativ / Trade-offs:**
+
 - [Was wird schwieriger oder teurer]
 
 ## Nächste Schritte

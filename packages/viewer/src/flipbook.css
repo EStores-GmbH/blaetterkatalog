@@ -1,0 +1,347 @@
+/* Viewer-Gestaltung, Phase 0.
+   Bewusst schlicht — das CI-Theme kommt in Phase 1 (T-026). Was hier schon
+   verbindlich ist: Kontraste, Fokus-Sichtbarkeit und Zielgrößen. */
+
+:root {
+  --akzent: #0057a0;
+  --grund: #ffffff;
+  --text: #1a1a1a;
+  --gedaempft: #595959; /* 7:1 auf Weiß */
+  --rand: #d4d4d4;
+  --buehne: #f2f2f2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Spaltenlayout über die volle Fensterhöhe: Kopf und Leiste nehmen sich, was
+   sie brauchen, die Bühne bekommt den Rest. Ohne das wächst der Katalog über
+   den Bildschirmrand hinaus — die Engine passt die Seite an die verfügbare
+   BREITE an, und ohne begrenzte Höhe wird die Bühne einfach mitgezogen.
+   dvh statt vh, damit die ein- und ausfahrende Browserleiste auf dem Handy
+   nicht dauernd das Layout verschiebt. */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--grund);
+  line-height: 1.5;
+}
+
+/* Fokus muss immer sichtbar sein — WCAG 2.4.7. Kontrast des Rings ≥ 3:1. */
+:focus-visible {
+  outline: 3px solid var(--akzent);
+  outline-offset: 2px;
+}
+
+/* Der Link zur Textfassung ist der erste Tabstopp. Er versteckt sich nicht
+   dauerhaft, sondern klappt bei Fokus sichtbar auf. */
+.skiplink {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.75rem 1rem;
+  background: var(--akzent);
+  color: #fff;
+  border-radius: 0 0 4px 4px;
+  transition: top 0.15s ease;
+}
+
+.skiplink:focus {
+  top: 0;
+}
+
+.kopf {
+  padding: 1rem 1.5rem 0.5rem;
+}
+
+.kopf h1 {
+  margin: 0;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+/* Die Bühne braucht eine BERECHNETE Höhe, keine Mindesthöhe.
+   Die Engine liest die Höhe ihres Behälters aus und verkleinert die Seite nur,
+   wenn dieser Wert feststeht. Aus einem `flex: 1` allein ergibt sich keiner:
+   Der Behälter würde einfach mit dem Inhalt mitwachsen — genau das ließ den
+   Katalog 427 px unter den Bildschirmrand rutschen.
+   Abgezogen werden Kopfzeile, Bedienhinweis und Leiste. */
+/* ---------------------------------------------------------------------------
+   Untergrund
+   Die Vorlagennamen (holz, holz-dunkel, grau, dunkel) müssen mit
+   src/hintergrund.ts und generator/src/cli.ts übereinstimmen. Ein TS-Test
+   (test/vorlagen-drift.test.ts) hält die beiden Code-Seiten deckungsgleich,
+   diese CSS-Datei kann er aber nicht prüfen — bei Änderungen hier mitdenken.
+   Kommt aus katalog.json (Feld `hintergrund`) und wird als data-Attribut an
+   die Bühne geschrieben. Bewusst als CSS statt als Bilddatei: kein Binärdatei
+   im Repo, keine Lizenzfrage, kein zusätzlicher Download — und die Maserung
+   lässt sich durch Ändern zweier Farbwerte umfärben.
+   --------------------------------------------------------------------------- */
+
+.buehne[data-hintergrund='holz'] {
+  --holz-grund: #8a5a33;
+  --holz-dunkel: #6b431f;
+}
+
+.buehne[data-hintergrund='holz-dunkel'] {
+  --holz-grund: #4a3220;
+  --holz-dunkel: #2f2113;
+}
+
+.buehne[data-hintergrund^='holz'] {
+  background-color: var(--holz-grund);
+  background-image:
+    /* Abdunklung zu den Rändern — lässt die Fläche als Tisch wirken statt als Farbfeld */
+    radial-gradient(135% 105% at 50% 32%, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.48) 100%),
+    /* Maserung, längs zu den Dielen. Drei Lagen mit leicht verschiedenen
+       Winkeln und Perioden — eine allein sieht aus wie ein Raster. */
+    repeating-linear-gradient(0.7deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(-0.5deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(0.3deg, rgba(0, 0, 0, 0.035) 0 2px, transparent 2px 17px),
+    /* Dielenfugen, waagerecht wie bei einer Tischplatte. Zwei Perioden, die
+       kein gemeinsames Vielfaches haben — sonst fällt die Wiederholung auf. */
+    repeating-linear-gradient(180deg, var(--holz-dunkel) 0 2px, transparent 2px 137px),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 211px);
+}
+
+/* Hintergrundbild. Die URL setzt der Viewer erst, wenn das Bild geladen ist —
+   bis dahin steht das gezeichnete Holz darunter, und bei einem fehlenden Bild
+   bleibt es stehen. */
+.buehne[data-hintergrund='bild'] {
+  background-color: var(--holz-grund, #8a5a33);
+  background-position: center;
+}
+
+/* Kleine Texturen wiederholen sich, große Fotos füllen. Entschieden wird das
+   anhand der tatsächlichen Bildgröße, nicht per Einstellung. */
+.buehne[data-darstellung='kachel'] {
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.buehne[data-darstellung='fuellend'] {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.buehne[data-hintergrund='grau'] {
+  background: #e9e9e9;
+}
+
+.buehne[data-hintergrund='dunkel'] {
+  background: #262626;
+}
+
+/* Das Buch soll auf dem Untergrund liegen, nicht darauf kleben.
+   Auf hellem Grau wäre der Schatten zu hart, dort fällt er weicher aus. */
+.buehne[data-hintergrund]:not([data-hintergrund='grau']) .seite {
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+
+.buehne[data-hintergrund='grau'] .seite {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+}
+
+.buehne {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--buehne);
+  height: clamp(320px, calc(100dvh - 11rem), 1000px);
+  /* Die Engine positioniert die nicht sichtbaren Seiten absolut; ohne
+     Beschneidung ragen sie unter den Bildschirmrand und erzeugen eine
+     Bildlaufleiste, obwohl nichts zu sehen ist. */
+  overflow: hidden;
+}
+
+.katalog {
+  flex: 1;
+  min-width: 0;
+  /* Feste Höhe statt Mindesthöhe: Die Engine liest sie aus und verkleinert
+     die Seite, wenn sie sonst nicht hineinpasst. */
+  height: 100%;
+}
+
+.katalog:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Zielgröße 44 px — WCAG 2.5.8 verlangt 24 px, 44 ist die bequeme Größe. */
+.blaettern {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--akzent);
+  background: var(--grund);
+  border: 1px solid var(--rand);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.blaettern:hover {
+  background: var(--akzent);
+  color: #fff;
+}
+
+.seite {
+  background: var(--grund);
+}
+
+.seite img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bedienhinweis,
+.leiste {
+  padding: 0.5rem 1.5rem;
+  color: var(--gedaempft);
+  font-size: 0.9rem;
+}
+
+.leiste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--rand);
+}
+
+.leiste p {
+  margin: 0;
+}
+
+.verweise a {
+  color: var(--akzent);
+  margin-left: 1rem;
+}
+
+.seitenstand {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Inhaltsverzeichnis --------------------------------------------------- */
+
+.toc-knopf {
+  min-height: 44px;
+  padding: 0 0.9rem;
+  margin-right: 0.5rem;
+  font: inherit;
+  color: var(--akzent);
+  background: var(--grund);
+  border: 1px solid var(--rand);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.toc-knopf:hover,
+.toc-knopf[aria-expanded='true'] {
+  background: var(--akzent);
+  color: #fff;
+  border-color: var(--akzent);
+}
+
+.toc {
+  border-top: 1px solid var(--rand);
+  background: var(--grund);
+  max-height: 40dvh;
+  overflow-y: auto;
+}
+
+.toc-liste {
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.toc-eintrag {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  /* 44 px Zielgröße, auch wenn der Text nur eine Zeile hoch ist. */
+  min-height: 44px;
+  padding: 0.5rem 1.5rem;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.toc-eintrag:hover {
+  background: #f2f6fa;
+  color: var(--akzent);
+}
+
+.toc-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.toc-seite {
+  flex: 0 0 auto;
+  color: var(--gedaempft);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc-eintrag:hover .toc-seite {
+  color: inherit;
+}
+
+/* Für Screenreader vorhanden, visuell nicht. Nicht display:none — das würde
+   die Ansage unterdrücken. */
+.nur-screenreader {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fehler,
+.hinweis-noscript {
+  margin: 1rem 1.5rem;
+  padding: 1rem;
+  border-left: 4px solid #b3261e;
+  background: #fdeceb;
+  color: #410e0b;
+}
+
+@media (max-width: 700px) {
+  .buehne {
+    flex-wrap: wrap;
+  }
+
+  .katalog {
+    order: -1;
+    flex-basis: 100%;
+  }
+
+  .blaettern {
+    flex: 1;
+    border-radius: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

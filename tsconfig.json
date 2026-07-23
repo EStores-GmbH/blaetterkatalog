@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Node führt die .ts-Dateien direkt aus (--experimental-strip-types).
+    // TypeScript prüft nur, es baut nichts.
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+
+    // Type-Stripping kann diese Konstrukte nicht übersetzen — sie brauchen
+    // eine echte Übersetzung. Der Compiler verbietet sie deshalb hier.
+    "erasableSyntaxOnly": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts"],
+
+  // Der einvendorte StPageFlip-Fork hat seine eigene Konfiguration — er wurde
+  // ohne Strict-Modus geschrieben und braucht die DOM-Typen.
+  // Geprüft wird er trotzdem: `npm run type-check` ruft beide Konfigurationen auf.
+  // Beide Pakete bringen eigene Konfigurationen mit: flip-engine läuft ohne
+  // Strict-Modus, der Viewer braucht zusätzlich die Browser-Typen.
+  // `npm run type-check` prüft alle drei.
+  "exclude": ["packages/flip-engine/**", "packages/viewer/**", "node_modules", "out"]
+}
