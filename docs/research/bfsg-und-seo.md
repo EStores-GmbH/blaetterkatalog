@@ -39,6 +39,7 @@ Stellungnahme gegen DE (März 2026) → Nachschärfung wahrscheinlich.
 **Norm heute:** EN 301 549 V3.2.1 → WCAG 2.1 AA. **Empfehlung: gegen WCAG 2.2 AA
 bauen** (abwärtskompatibel, V4.1.1 mit 2.2 ca. Okt. 2026 erwartet). Die neuen 2.2-
 Kriterien treffen einen Flip-Viewer ins Mark:
+
 - **2.5.7 Dragging Movements** — Blättern muss auch per Klick/Tastatur gehen.
 - **2.4.11 Focus Not Obscured** — Fokus nicht unter Sticky-Toolbar/Cookie-Banner.
 - **2.5.8 Target Size (24×24 px)** — Buttons, Thumbnails, TOC-Einträge.
@@ -48,6 +49,7 @@ Name/Rolle/Status (aria-live), 1.4.3/1.4.11 Kontrast, 1.4.4 Zoom 200 %, 1.4.10 R
 2.2.2/2.3.1 Animation pausierbar, `prefers-reduced-motion`.
 
 **Katalog-Inhalt (der harte Teil):**
+
 - **1.4.5 Images of Text** — Text-in-Bildern verboten; Ausnahmen (customizable/
   essential) greifen bei Katalogseiten nicht.
 - **1.1.1 Textalternativen** — 150 Seiten; ein `alt` ist das falsche Werkzeug.
@@ -67,6 +69,7 @@ Verstoß und häufigster Abmahn-/Bußgeldanlass. → T-024.
 
 **Der belegte Weg: „Conforming Alternate Version" (WCAG-Konformitätsanforderung 1).**
 Bedingungen (W3C, wörtlich):
+
 1. erfüllt selbst voll AA;
 2. bietet **alle** gleiche Information UND Funktionalität (also auch Suche, TOC, Download);
 3. ist **so aktuell** wie das Original (aus derselben Pipeline);
@@ -97,12 +100,14 @@ aber eindeutig. Flipbooks gelten in der DE-Fachliteratur als Lehrbuchbeispiel f�
 
 **Empfohlenes Muster — eine echte HTML-Seite je Katalogseite, die zugleich die
 WCAG-Alternativversion ist:**
+
 ```text
 /kataloge/                → Übersicht (CollectionPage + ItemList)
 /kataloge/<slug>/         → Viewer + Link „Textversion"
 /kataloge/<slug>/text/    → Gesamttext („View All")
 /kataloge/<slug>/seite-N/ → Einzelseite: HTML-Text + Bild + Link in den Viewer
 ```
+
 - Self-referencing Canonical je Seite (**nicht** auf die Übersicht kanonisieren).
 - Sequenzielle `<a>`-Links vor/zurück; alle URLs in `sitemap.xml`.
 - `BreadcrumbList` + `CollectionPage`/`ItemList`; **kein `Product`-Schema** (nicht kaufbar).

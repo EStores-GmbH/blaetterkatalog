@@ -58,6 +58,7 @@ Alt-Texte und Ladekontrolle.
 `<meta name="Generator" content="FlipPDFPlusPro for mac v6.9.9">` — kommerzielles
 Desktop-Export-Tool, kein Web-Stack. Lädt jQuery 3.5.1 + Vue-App. Zwei Fehler,
 die wir nicht übernehmen:
+
 - `user-scalable=no` im Viewport — verletzt WCAG 1.4.4 (Zoom unterbunden).
 - SEO-Fallback nur in `<noscript>` → `files/basic-html/page1.html`, bei igefa
   **defekt** (unaufgelöste Platzhalter `${meta.description}`, Titel „Page 1 - Demo").
