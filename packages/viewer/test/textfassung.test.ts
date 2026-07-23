@@ -100,9 +100,11 @@ describe('baueTextfassung', () => {
   });
 
   test('maskiert einen Titel mit Sonderzeichen', () => {
-    const html = baueTextfassung(katalog({ titel: 'A & B <script>' }));
-    assert.match(html, /A &amp; B &lt;script&gt;/);
-    assert.doesNotMatch(html, /<script>/);
+    const html = baueTextfassung(katalog({ titel: 'A & B <SCRIPT>' }));
+    assert.match(html, /A &amp; B &lt;SCRIPT&gt;/);
+    // Case-insensitiv: eine fehlerhafte Maskierung, die <SCRIPT> durchließe,
+    // soll nicht durchrutschen, nur weil der Test kleingeschrieben prüft.
+    assert.doesNotMatch(html, /<script/i);
   });
 
   test('fällt bei ungültiger Akzentfarbe auf den Standard zurück', () => {
