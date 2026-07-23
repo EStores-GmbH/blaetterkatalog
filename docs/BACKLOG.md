@@ -58,10 +58,26 @@ Status: `[ ]` offen · `[~]` in Arbeit (+ Branch nennen) · `[x]` fertig (+ Datu
 - [ ] T-030  Bedienanleitung für die Redaktion — Zielgruppe Nicht-Entwickler
 - [ ] T-031  Abnahme: jemand aus der Redaktion veröffentlicht einen echten Katalog selbst
 
+## Technische Schuld aus Phase 0 (aus dem Code-Review, bewusst aufgeschoben)
+
+- [ ] T-037  CLI-Integrationstest: kompletter `katalog-build`-Durchlauf mit echtem Test-PDF
+      (Werkzeugprüfung, Render/Text-Abgleich, Bildkopie, Manifest, Ausgabe). Vom Review
+      als P1-Coverage-Lücke benannt — die zentrale Produktfunktion ist nur in Einzelteilen getestet.
+- [ ] T-038  `flipbook.ts`-Test mit DOM- und Engine-Stub (Laden, Lazy-Loading, Querformat,
+      ARIA-Ansage, TOC-Sprung, Tastatur, `pagehide`-Cleanup). Bisher nur per Browser geprüft.
+- [ ] T-039  CI-Plumbing dokumentieren/festigen: gitleaks läuft ohne Lizenz über das
+      Release-Binary (nicht die Action), CodeQL braucht `actions: read`, Code Security ist
+      aktiviert (kostenpflichtig bei privaten Repos). Steht bisher nur in Commit-Messages.
+- [ ] T-040  Lizenz/Herkunft des Holzbilds in `packages/viewer/assets/LIESMICH.md` eintragen
+      (Feld ist leer). Ein Bild ohne dokumentierte Nutzungslizenz ist ein Compliance-Risiko.
+      (Prio: mittel · Verantwortlich: Armin)
+
 ## Icebox
 
 <!-- Ideen ohne Termin — bewusst geparkt -->
 
+- estores-marketplace PR #2 (Befehl-Umbenennung `/plan`→`/session-start`, `/pr-review`) und
+  Issue #3 sind noch OFFEN. `/session-start` greift erst nach Merge + `/reload-plugins`.
 - Phase 3: Zoom/Lupe, Thumbnail-Leiste, Produkt-Hotspots, Teilen-Links, Aufruf-Statistik,
   Treffer-Highlighting via unsichtbarer Textebene
 - Eigener Objektspeicher (R2/S3) statt Storyblok-Assets — erst relevant bei Tarifwechsel
