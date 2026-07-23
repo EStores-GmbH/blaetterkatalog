@@ -170,10 +170,16 @@ Diese sind subtil und im Code kommentiert, aber leicht zu übersehen:
 
 - **Zoom fehlt** der Engine komplett (Roadmap Phase 3).
 - **Querformat** ist implementiert, aber nur mit Hochformat getestet (T-033).
+- **Testschuld aus Phase 0** (bewusst aufgeschoben, jetzt im Backlog): CLI-Integrationstest
+  (T-037), `flipbook.ts`-DOM-Test (T-038) — beide vom Code-Review als P1-Coverage benannt.
+- **Holzbild-Lizenz** (`assets/LIESMICH.md`) ist nicht eingetragen (T-040).
 - **`develop`/`staging`-Branches** existieren im Remote nicht, obwohl `AGENTS.md`
   sie als Weg beschreibt. Anlegen oder Regel anpassen.
-- **CI-Randnotiz:** GitHub Code Security ist aktiviert (kostet bei privaten Repos).
-  `secret_scanning` ist aus; unser gitleaks deckt es ab.
+- **CI-Plumbing** (T-039): GitHub Code Security aktiviert (kostet bei privaten Repos);
+  gitleaks läuft ohne Lizenz über das Release-Binary; CodeQL braucht `actions: read`.
+  Bisher nur in Commit-Messages, nicht in den Docs.
+- **Cross-Repo:** estores-marketplace PR #2/#3 noch offen — `/session-start` greift erst
+  nach deren Merge.
 
 ## 8. Der Weg vom POC zu Phase 1
 
@@ -210,6 +216,7 @@ eingelöst — solange nur der CLI-Befehl existiert, läuft jede Veröffentlichu
 | `docs/COMPLIANCE.md` | BFSG/a11y, SEO/CWV, Datenschutz, Security |
 | `docs/THREAT-MODEL.md` | Angriffsflächen (Management-Token, Rebuild-Webhook) |
 | `decisions/log.md` | **das Warum** — append-only Entscheidungs-Log |
+| `docs/research/` | **die Beweise** — Volltext der 3 Recherchen (Engine, Storyblok, BFSG/SEO) hinter den 6 gekippten Entscheidungen |
 | `packages/flip-engine/HERKUNFT.md` | Fork-Herkunft, alle Patches, Abgleich-Anleitung |
 | `packages/generator/README.md` | Generator: Aufbau, Ausführen, Erweitern |
 | `packages/viewer/README.md` | Viewer: Aufbau, Ausführen, Erweitern |
