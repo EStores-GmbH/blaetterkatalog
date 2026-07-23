@@ -46,7 +46,10 @@ Typen: feat / fix / docs / style / refactor / perf / test / build / ci / chore
 
 ## Kommunikation
 
-- Immer auf Deutsch antworten (Code-Kommentare auf Englisch)
+- Immer auf Deutsch antworten. **Code-Kommentare auf Deutsch** (Bezeichner sind
+  ohnehin deutsch; der Nutzer liest den Code). Ausnahme: einvendorter Fremdcode
+  (`packages/flip-engine/`) — dort passen sich unsere `PATCH`-Kommentare der
+  englischen Sprache des Upstreams an.
 - Vor größeren Änderungen: Plan erklären und Bestätigung abwarten
 - Technische Begriffe immer kurz erklären (Nutzer ist Nicht-Entwickler)
 - Bei Unklarheiten: fragen statt raten

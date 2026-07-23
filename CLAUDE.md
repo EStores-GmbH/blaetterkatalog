@@ -57,7 +57,9 @@ npx tsc --noEmit              # Typ-Prüfung
 - Naming: `camelCase` für Werte und Funktionen, `PascalCase` für Typen und Komponenten,
   `kebab-case` für Dateinamen
 - Imports: absolute Pfade innerhalb eines Pakets, Pakete untereinander über den Workspace-Namen
-- Fachbegriffe im Code auf Englisch, Kommentare auf Englisch, Nutzertexte auf Deutsch
+- Kommentare und Nutzertexte auf Deutsch; technische Fachbegriffe (API-Namen,
+  Muster) bleiben im Original. Ausnahme: `packages/flip-engine/` (Fremdcode) —
+  siehe AGENTS.md.
 - Error Handling: Immer explizit — keine stillen Failures. Der Generator bricht mit
   verständlicher Meldung ab, statt halbe Kataloge zu veröffentlichen.
 - Tests: Für jede neue Funktion mind. ein Unit-Test
