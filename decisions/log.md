@@ -58,3 +58,11 @@ beim Neubau fast nichts. Ausgerechnet die neuen Kriterien treffen einen Blätter
 (Bundesfachstelle Barrierefreiheit, Noerr) trägt das nicht: nötig wären wirksame technische
 Vorkehrungen gegen Verbraucherbestellungen. Klärung durch Rechtsberatung offen — siehe
 docs/BACKLOG.md. Nachträglich weglassen ist einfacher als nachrüsten.
+
+[2026-07-23] [Armin] **Phase 0 (POC) abgeschlossen und gemergt (PR #3).** Generator,
+einvendorte Blätter-Engine, Viewer und HTML-Textfassung sind lokal lauffähig — noch
+ohne Storyblok/Astro. 129 Tests, 7-fach-Code-Review durchlaufen, alle Funde behoben.
+Übergabe-Dokumentation als `docs/POC-STATUS.md` (Ist-Zustand, Provisorien, Weg zu
+Phase 1) plus README je Paket. Bewusst als POC gebaut: dev-server.ts und die
+Platte-als-Datenquelle werden in Phase 1 durch Astro + Storyblok ersetzt, der
+Generator- und Viewer-Logikcode bleibt.
