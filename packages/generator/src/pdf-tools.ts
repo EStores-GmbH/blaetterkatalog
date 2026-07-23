@@ -1,16 +1,16 @@
 /**
- * Thin wrapper around the Poppler command line tools.
+ * Dünne Hülle um die Poppler-Kommandozeilenwerkzeuge.
  *
- * Poppler is a system dependency, not an npm package. If it is missing the
- * generator must say so in plain language instead of failing with ENOENT
- * somewhere deep in a child process.
+ * Poppler ist eine Systemabhängigkeit, kein npm-Paket. Fehlt es, muss der
+ * Generator das in klarer Sprache sagen, statt tief in einem Kindprozess mit
+ * ENOENT abzubrechen.
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-/** Every Poppler binary the generator relies on, with what we need it for. */
+/** Jedes Poppler-Binary, auf das sich der Generator stützt, mit seinem Zweck. */
 export const BENOETIGTE_WERKZEUGE = [
   { name: 'pdfinfo', zweck: 'Seitenzahl und Seitenformat auslesen' },
   { name: 'pdftoppm', zweck: 'Seiten zu Bildern rendern' },
@@ -38,8 +38,9 @@ export class WerkzeugFehlt extends Error {
 }
 
 /**
- * Verifies every required binary is callable. Called once at startup so the
- * user learns about a missing dependency before we render 46 pages.
+ * Prüft, dass jedes benötigte Binary aufrufbar ist. Wird einmal beim Start
+ * aufgerufen, damit der Nutzer von einer fehlenden Abhängigkeit erfährt, bevor
+ * wir 46 Seiten rendern.
  */
 export async function pruefeWerkzeuge(): Promise<void> {
   const ergebnisse = await Promise.all(
@@ -55,8 +56,8 @@ export async function pruefeWerkzeuge(): Promise<void> {
 
 async function istVerfuegbar(programm: string): Promise<boolean> {
   try {
-    // -v exits non-zero on some Poppler builds but still proves the binary
-    // exists; only a spawn error (ENOENT) means it is genuinely absent.
+    // -v endet bei manchen Poppler-Builds mit Nicht-null, beweist aber trotzdem,
+    // dass das Binary existiert; nur ein Spawn-Fehler (ENOENT) heißt, dass es wirklich fehlt.
     await execFileAsync(programm, ['-v']);
     return true;
   } catch (fehler) {
@@ -67,7 +68,7 @@ async function istVerfuegbar(programm: string): Promise<boolean> {
 
 export interface PdfInfo {
   seitenzahl: number;
-  /** Page size in PostScript points (1 pt = 1/72 inch). */
+  /** Seitengröße in PostScript-Punkten (1 pt = 1/72 Zoll). */
   breitePt: number;
   hoehePt: number;
   titel: string | undefined;
@@ -91,9 +92,10 @@ export async function leseInfo(pdfPfad: string): Promise<PdfInfo> {
 }
 
 /**
- * Parses pdfinfo output. Split from leseInfo so it can be tested against fixed
- * output — including the fail-closed encryption gate, on which cli.ts relies
- * to reject copy-protected PDFs.
+ * Parst die pdfinfo-Ausgabe. Von leseInfo getrennt, damit sie gegen feste
+ * Ausgabe getestet werden kann — einschließlich der fail-closed
+ * Verschlüsselungssperre, auf die sich cli.ts verlässt, um kopiergeschützte
+ * PDFs abzuweisen.
  */
 export function werteAusPdfInfo(stdout: string): PdfInfo {
   const feld = (name: string): string | undefined =>
@@ -121,7 +123,7 @@ export function werteAusPdfInfo(stdout: string): PdfInfo {
   };
 }
 
-/** Runs a Poppler binary and returns stdout. Errors keep the tool's own message. */
+/** Führt ein Poppler-Binary aus und liefert stdout. Fehler behalten die Meldung des Werkzeugs. */
 export async function fuehreAus(
   programm: string,
   argumente: string[],

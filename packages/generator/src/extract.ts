@@ -1,22 +1,22 @@
 /**
- * Pulls text out of the PDF — twice, for two different consumers.
+ * Holt Text aus dem PDF — zweimal, für zwei verschiedene Abnehmer.
  *
- *   text_html  → the accessible text route and what search engines index
- *   Suchindex  → plain text for client-side full-text search
+ *   text_html  → die barrierefreie Textroute und was Suchmaschinen indexieren
+ *   Suchindex  → reiner Text für die clientseitige Volltextsuche
  *
- * Both come from one `pdftotext` run per page — the text is extracted for
- * search anyway, so the HTML text version costs nothing extra.
+ * Beide stammen aus einem `pdftotext`-Lauf je Seite — der Text wird ohnehin
+ * für die Suche extrahiert, die HTML-Textfassung kostet also nichts extra.
  */
 import { fuehreAus } from './pdf-tools.ts';
 import type { SuchindexEintrag, TocEintrag } from './types.ts';
 
-/** Table of contents as parsed — the file position is added later. */
+/** Inhaltsverzeichnis wie geparst — die Dateiposition wird später ergänzt. */
 export type TocRoheintrag = Omit<TocEintrag, 'index'>;
 
 /**
- * `-layout` is deliberately NOT used. It preserves the visual column layout but
- * leaves words broken across lines — 21 of them in the reference catalogue
- * ("rich-\ntigen"). Without it Poppler rejoins them.
+ * `-layout` wird bewusst NICHT verwendet. Es erhält das visuelle Spaltenlayout,
+ * lässt aber Wörter über Zeilen getrennt — 21 davon im Referenzkatalog
+ * ("rich-\ntigen"). Ohne die Option fügt Poppler sie wieder zusammen.
  */
 export async function extrahiereSeitentext(
   pdfPfad: string,
@@ -45,18 +45,19 @@ export async function extrahiereAlleSeiten(
   return texte;
 }
 
-/** Invisible in print, poison for a search index. */
+/** Im Druck unsichtbar, Gift für einen Suchindex. */
 const WEICHES_TRENNZEICHEN = /­/g;
-/** Typographic spaces that should compare equal to a plain one. */
+/** Typografische Leerzeichen, die einem gewöhnlichen gleichkommen sollen. */
 const SONDER_LEERZEICHEN = /[    ]/g;
 
 /**
- * Removes typesetting artefacts that InDesign leaves in the text layer.
+ * Entfernt Satz-Artefakte, die InDesign in der Textebene hinterlässt.
  *
- * A soft hyphen inside a word is invisible on screen but splits the word for
- * any string comparison — searching for "zuverlässige" would silently miss a
- * page containing "zuver­lässige". Unicode is normalised to NFC so that
- * composed and decomposed umlauts compare equal.
+ * Ein weiches Trennzeichen innerhalb eines Wortes ist am Bildschirm unsichtbar,
+ * zerteilt das Wort aber für jeden Zeichenkettenvergleich — die Suche nach
+ * "zuverlässige" würde eine Seite mit "zuver­lässige" stillschweigend
+ * übersehen. Unicode wird nach NFC normalisiert, damit zusammengesetzte und
+ * zerlegte Umlaute gleich verglichen werden.
  */
 export function bereinigeText(rohText: string): string {
   return rohText
@@ -77,16 +78,16 @@ export function maskiereHtml(text: string): string {
 }
 
 /**
- * Turns raw page text into paragraphs.
+ * Wandelt rohen Seitentext in Absätze.
  *
- * Headings are not detected. Doing that properly needs the PDF's tag tree,
- * which pdftotext does not expose — guessing from line length would produce
- * wrong headings, and a wrong heading structure is worse for screen reader
- * users than none at all.
+ * Überschriften werden nicht erkannt. Das sauber zu machen bräuchte den
+ * Tag-Baum des PDFs, den pdftotext nicht offenlegt — ein Raten nach Zeilenlänge
+ * würde falsche Überschriften erzeugen, und eine falsche Überschriftenstruktur
+ * ist für Screenreader-Nutzer schlimmer als gar keine.
  */
 export function baueTextHtml(rohText: string): string {
-  // Blank-line split uses an explicit class instead of \s — \s matches \n too,
-  // which makes the pattern ambiguous and prone to catastrophic backtracking.
+  // Der Leerzeilen-Split nutzt eine explizite Zeichenklasse statt \s — \s passt
+  // auch auf \n, was das Muster mehrdeutig und anfällig für katastrophales Backtracking macht.
   const absaetze = rohText
     .split(/\n[ \t\r]*\n/)
     .map((a) => a.replace(/\s+/g, ' ').trim())
@@ -95,7 +96,7 @@ export function baueTextHtml(rohText: string): string {
   return absaetze.map((a) => `<p>${maskiereHtml(a)}</p>`).join('\n');
 }
 
-/** Collapses whitespace so the search index stays small and comparable. */
+/** Fasst Whitespace zusammen, damit der Suchindex klein und vergleichbar bleibt. */
 export function normalisiereFuerSuche(rohText: string): string {
   return rohText.replace(/\s+/g, ' ').trim();
 }
@@ -106,25 +107,26 @@ export function baueSuchindex(seitentexte: string[]): SuchindexEintrag[] {
     .filter((e) => e.text.length > 0);
 }
 
-/** A table of contents needs at least this many entries to be believable. */
+/** So viele Einträge braucht ein Inhaltsverzeichnis mindestens, um glaubwürdig zu sein. */
 const MIN_TOC_EINTRAEGE = 3;
 
-/** How far into the document we look for the contents page. */
+/** Wie weit wir im Dokument nach der Inhaltsseite suchen. */
 const TOC_SUCHTIEFE = 8;
 
 /**
- * Reads the table of contents off the printed contents page.
+ * Liest das Inhaltsverzeichnis von der gedruckten Inhaltsseite ab.
  *
- * Poppler exposes no way to dump PDF bookmarks, and the reference catalogue
- * carries its contents as a normal page anyway. Layout there is:
+ * Poppler bietet keine Möglichkeit, PDF-Lesezeichen auszugeben, und der
+ * Referenzkatalog trägt sein Inhaltsverzeichnis ohnehin als normale Seite.
+ * Das Layout dort ist:
  *
  *     Vorwort\t\t\t\t
- *     (blank)
+ *     (leer)
  *     4
  *
- * so a line holding nothing but a number closes the entry that precedes it.
- * Returns an empty list when nothing convincing is found — a wrong table of
- * contents would be worse than none.
+ * eine Zeile, die nur eine Zahl enthält, schließt also den vorangehenden
+ * Eintrag ab. Liefert eine leere Liste, wenn nichts Überzeugendes gefunden
+ * wird — ein falsches Inhaltsverzeichnis wäre schlimmer als keines.
  */
 export function findeTocAufSeite(seitentext: string): TocRoheintrag[] {
   const zeilen = seitentext
@@ -147,9 +149,9 @@ export function findeTocAufSeite(seitentext: string): TocRoheintrag[] {
       continue;
     }
 
-    // "Impressum   45" — label and number on the same line. Split by hand
-    // rather than by regex: a pattern like /^(.*\S)\s+(\d+)$/ backtracks badly
-    // on long lines, and page text can be arbitrarily long.
+    // "Impressum   45" — Label und Zahl auf derselben Zeile. Von Hand splitten
+    // statt per Regex: ein Muster wie /^(.*\S)\s+(\d+)$/ backtrackt auf langen
+    // Zeilen stark, und Seitentext kann beliebig lang sein.
     const teile = inhalt.split(/[ \t]+/);
     const letztes = teile.at(-1);
     if (teile.length >= 2 && letztes !== undefined && ZAHL.test(letztes)) {
@@ -170,10 +172,11 @@ export function findeTocAufSeite(seitentext: string): TocRoheintrag[] {
 const ZAHL = /^\d{1,4}$/;
 
 /**
- * Strips the dot leaders that run towards the page number.
+ * Entfernt die Füllpunkte, die zur Seitenzahl hinlaufen.
  *
- * Done as a loop rather than /[.…]+$/ — an anchored quantified class degrades
- * to quadratic time on a long run of dots, and dot leaders are exactly that.
+ * Als Schleife statt /[.…]+$/ — eine verankerte quantifizierte Zeichenklasse
+ * wird bei einer langen Punktreihe quadratisch langsam, und Füllpunkte sind
+ * genau das.
  */
 function saubereLabel(roh: string): string {
   const einzeilig = roh.replace(/\s+/g, ' ').trim();
@@ -189,15 +192,15 @@ function saubereLabel(roh: string): string {
 }
 
 /**
- * Keeps only entries whose page numbers keep climbing.
+ * Behält nur Einträge, deren Seitenzahlen weiter steigen.
  *
- * A table of contents counts upwards. Anything that does not is noise from the
- * same page — the running footer "Seite 3" for instance parses as a perfectly
- * valid entry and would otherwise end up in the navigation.
+ * Ein Inhaltsverzeichnis zählt aufwärts. Was das nicht tut, ist Rauschen von
+ * derselben Seite — die laufende Fußzeile "Seite 3" etwa parst als völlig
+ * gültiger Eintrag und landete sonst in der Navigation.
  *
- * Chapters that share a starting page are dropped as collateral. That is the
- * cheaper mistake: a missing entry is invisible, a wrong one sends readers to
- * the wrong page.
+ * Kapitel, die sich eine Anfangsseite teilen, fallen als Kollateralschaden
+ * weg. Das ist der billigere Fehler: Ein fehlender Eintrag ist unsichtbar, ein
+ * falscher schickt Leser auf die falsche Seite.
  */
 function nurAufsteigend(eintraege: TocRoheintrag[]): TocRoheintrag[] {
   const behalten: TocRoheintrag[] = [];
@@ -213,19 +216,19 @@ function nurAufsteigend(eintraege: TocRoheintrag[]): TocRoheintrag[] {
 }
 
 /**
- * Difference between printed page numbers and PDF page positions.
+ * Unterschied zwischen gedruckten Seitenzahlen und PDF-Seitenpositionen.
  *
- * A table of contents cites the number printed on the page. Many catalogues
- * carry unnumbered front matter, so printed page 4 can be the 6th page of the
- * file — and a table of contents that jumps by the printed number would land
- * two pages off, on every single entry.
+ * Ein Inhaltsverzeichnis nennt die auf der Seite gedruckte Zahl. Viele Kataloge
+ * haben unnummerierte Vorsatzblätter, sodass die gedruckte Seite 4 die 6. Seite
+ * der Datei sein kann — und ein Inhaltsverzeichnis, das nach der gedruckten
+ * Zahl springt, läge bei jedem einzelnen Eintrag zwei Seiten daneben.
  *
- * Pages usually print their number in the footer ("Seite 12"). Comparing that
- * against the page's position gives the offset. A majority vote guards against
- * a stray number somewhere in the body text.
+ * Seiten drucken ihre Zahl meist in die Fußzeile ("Seite 12"). Der Vergleich
+ * mit der Position der Seite ergibt den Versatz. Eine Mehrheitsentscheidung
+ * schützt vor einer versprengten Zahl irgendwo im Fließtext.
  *
- * Returns 0 when nothing can be determined — then printed number and position
- * are assumed to be the same, which is the common case.
+ * Liefert 0, wenn sich nichts bestimmen lässt — dann werden gedruckte Zahl und
+ * Position als gleich angenommen, was der Normalfall ist.
  */
 /** Zeilenweise statt per Sammelausdruck — der wäre auf langen Seiten anfällig. */
 const FUSSZEILE = /^(?:Seite|Page)[ \t]+(\d{1,4})$/;
@@ -262,7 +265,7 @@ export function findeSeitenversatz(seitentexte: string[]): number {
   return besteAnzahl >= 2 ? besterVersatz : 0;
 }
 
-/** Maps printed page numbers to positions in the file. */
+/** Bildet gedruckte Seitenzahlen auf Positionen in der Datei ab. */
 export function versetzeToc(
   toc: TocRoheintrag[],
   versatz: number,

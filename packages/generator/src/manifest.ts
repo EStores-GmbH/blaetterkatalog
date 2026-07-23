@@ -1,10 +1,10 @@
 /**
- * Writes the two output files.
+ * Schreibt die beiden Ausgabedateien.
  *
- * `katalog.json` describes the catalogue. `suchindex.json` is written next to
- * it but deliberately kept separate: in phase 1 the catalogue becomes a
- * Storyblok story, and shipping the index inside it would send the full text of
- * every page on every single request. See decisions/log.md.
+ * `katalog.json` beschreibt den Katalog. `suchindex.json` wird daneben
+ * geschrieben, aber bewusst getrennt gehalten: In Phase 1 wird der Katalog zu
+ * einer Storyblok-Story, und den Index darin mitzuliefern würde bei jeder
+ * einzelnen Anfrage den Volltext jeder Seite mitschicken. Siehe decisions/log.md.
  */
 import { writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -22,8 +22,9 @@ export async function pruefsumme(pfad: string): Promise<string> {
 }
 
 /**
- * Turns a filename into a URL-safe slug. German umlauts are transliterated
- * rather than stripped, so "Süße Momente" stays readable as "suesse-momente".
+ * Wandelt einen Dateinamen in einen URL-sicheren Slug. Deutsche Umlaute werden
+ * transliteriert statt entfernt, sodass "Süße Momente" als "suesse-momente"
+ * lesbar bleibt.
  */
 export function baueSlug(text: string): string {
   const ersatz: Record<string, string> = {
@@ -39,7 +40,7 @@ export function baueSlug(text: string): string {
     .slice(0, 80);
 }
 
-/** Falls back to the file name when the PDF carries no usable title. */
+/** Weicht auf den Dateinamen aus, wenn das PDF keinen brauchbaren Titel trägt. */
 export function baueTitel(pdfPfad: string, pdfTitel: string | undefined): string {
   const ausMetadaten = pdfTitel?.trim();
   if (ausMetadaten && ausMetadaten.length > 2) return ausMetadaten;

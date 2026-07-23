@@ -1,17 +1,18 @@
 /**
- * The one place that knows about the flip engine.
+ * Die einzige Stelle, die von der Flip-Engine weiß.
  *
- * Two jobs:
+ * Zwei Aufgaben:
  *
- *  1. It declares exactly which part of the engine we depend on. Should the
- *     engine ever be replaced, this file is the whole surface to reimplement —
- *     not the viewer.
+ *  1. Sie deklariert genau, auf welchen Teil der Engine wir uns stützen. Würde
+ *     die Engine je ersetzt, ist diese Datei die gesamte neu zu
+ *     implementierende Fläche — nicht der Viewer.
  *
- *  2. It keeps the vendored code out of our type program. The engine was
- *     written without strict mode (see flip-engine/HERKUNFT.md); importing it
- *     statically would force the viewer to drop strictness too. Loading it
- *     through a computed specifier keeps our code strict and the engine
- *     checked by its own configuration.
+ *  2. Sie hält den fremdbezogenen Code aus unserem Typprogramm heraus. Die
+ *     Engine wurde ohne Strict Mode geschrieben (siehe flip-engine/HERKUNFT.md);
+ *     sie statisch zu importieren würde den Viewer zwingen, die Strictness
+ *     ebenfalls fallenzulassen. Sie über einen berechneten Specifier zu laden
+ *     hält unseren Code strict und die Engine nach ihrer eigenen Konfiguration
+ *     geprüft.
  */
 
 export type EngineAusrichtung = 'portrait' | 'landscape';
@@ -35,12 +36,12 @@ export interface FlipOptionen {
   maxWidth: number;
   minHeight: number;
   maxHeight: number;
-  /** Cover and back cover are shown alone, like a real magazine. */
+  /** Umschlag und Rückseite werden allein gezeigt, wie bei einem echten Magazin. */
   showCover: boolean;
-  /** Allows the single-page layout on narrow screens. */
+  /** Erlaubt das Einzelseiten-Layout auf schmalen Bildschirmen. */
   usePortrait: boolean;
   mobileScrollSupport: boolean;
-  /** Milliseconds. 0 turns the animation off for prefers-reduced-motion. */
+  /** Millisekunden. 0 schaltet die Animation für prefers-reduced-motion ab. */
   flippingTime: number;
   maxShadowOpacity: number;
   drawShadow: boolean;
@@ -57,8 +58,9 @@ export interface FlipOptionen {
 type EngineKonstruktor = new (behaelter: HTMLElement, optionen: FlipOptionen) => FlipEngine;
 
 /**
- * Path is built at runtime so TypeScript cannot follow it into the vendored
- * sources. The browser resolves it relative to this module.
+ * Der Pfad wird zur Laufzeit gebaut, damit TypeScript ihm nicht in die
+ * fremdbezogenen Quellen folgen kann. Der Browser löst ihn relativ zu diesem
+ * Modul auf.
  */
 const ENGINE_PFAD = ['..', '..', 'flip-engine', 'src', 'PageFlip.ts'].join('/');
 

@@ -1,27 +1,27 @@
 /**
- * Backdrop the book sits on.
+ * Untergrund, auf dem das Buch liegt.
  *
- * Kept apart from flipbook.ts on purpose: that module boots the viewer on
- * import and therefore needs a browser. The decision itself is pure and has to
- * be testable without one.
+ * Bewusst von flipbook.ts getrennt: Jenes Modul startet den Viewer beim Import
+ * und braucht daher einen Browser. Die Entscheidung selbst ist pur und muss
+ * ohne einen testbar sein.
  *
- * A catalogue may specify:
- *   - an image — a path or URL ("hintergrund.jpg", "/assets/holz.jpg",
- *     or in phase 1 a Storyblok asset URL)
- *   - a preset name ("holz", "holz-dunkel", "grau", "dunkel")
- *   - a plain hex colour
+ * Ein Katalog kann angeben:
+ *   - ein Bild — ein Pfad oder eine URL ("hintergrund.jpg", "/assets/holz.jpg",
+ *     oder in Phase 1 eine Storyblok-Asset-URL)
+ *   - einen Vorlagennamen ("holz", "holz-dunkel", "grau", "dunkel")
+ *   - eine reine Hex-Farbe
  *
- * Nothing specified means the shipped default image.
+ * Nichts angegeben bedeutet das mitgelieferte Standardbild.
  */
 import { HEX_FARBE } from './farbe.ts';
 
-/** Backdrops with a matching rule in flipbook.css. */
+/** Hintergründe mit einer passenden Regel in flipbook.css. */
 export const HINTERGRUND_VORLAGEN = new Set(['holz', 'holz-dunkel', 'grau', 'dunkel']);
 
-/** Ships with the viewer. Overridable per catalogue. */
+/** Wird mit dem Viewer mitgeliefert. Pro Katalog überschreibbar. */
 export const HINTERGRUND_STANDARD_BILD = '/assets/hintergrund-holz.jpg';
 
-/** Used when neither the catalogue nor the default image yields anything. */
+/** Wird verwendet, wenn weder der Katalog noch das Standardbild etwas liefert. */
 export const HINTERGRUND_NOTNAGEL = 'holz';
 
 const BILDENDUNG = /\.(jpe?g|png|webp|avif)$/i;
@@ -30,26 +30,27 @@ export type HintergrundArt = 'bild' | 'vorlage' | 'farbe';
 
 export interface HintergrundWahl {
   art: HintergrundArt;
-  /** Value for the data attribute the stylesheet keys off. */
+  /** Wert für das data-Attribut, an dem das Stylesheet ansetzt. */
   kennung: string;
-  /** Image URL, for art === 'bild'. */
+  /** Bild-URL, für art === 'bild'. */
   bild: string | undefined;
-  /** Colour, for art === 'farbe'. */
+  /** Farbe, für art === 'farbe'. */
   farbe: string | undefined;
 }
 
-/** Anything that looks like a path or URL to an image file. */
+/** Alles, was wie ein Pfad oder eine URL zu einer Bilddatei aussieht. */
 export function istBildangabe(wert: string): boolean {
   if (BILDENDUNG.test(wert.split('?')[0] ?? '')) return true;
   return wert.startsWith('http://') || wert.startsWith('https://') || wert.startsWith('//');
 }
 
 /**
- * Turns the stored value into a URL the browser can fetch.
+ * Wandelt den gespeicherten Wert in eine URL, die der Browser laden kann.
  *
- * The generator stores a path relative to katalog.json — exactly like it does
- * for page images — so the catalogue directory stays movable. Absolute paths
- * and full URLs (phase 1: Storyblok assets) are passed through untouched.
+ * Der Generator speichert einen Pfad relativ zu katalog.json — genau wie bei
+ * den Seitenbildern — damit das Katalogverzeichnis verschiebbar bleibt.
+ * Absolute Pfade und vollständige URLs (Phase 1: Storyblok-Assets) werden
+ * unverändert durchgereicht.
  */
 export function loeseBildUrl(wert: string, basis = '/katalog/'): string {
   if (wert.startsWith('/') || wert.includes('://')) return wert;
@@ -84,10 +85,10 @@ export function waehleHintergrund(wunsch: string | undefined): HintergrundWahl {
 }
 
 /**
- * Small textures are meant to tile, large photographs to fill.
+ * Kleine Texturen sollen kacheln, große Fotos füllen.
  *
- * Deciding this from the loaded image spares the catalogue an extra setting
- * that would be wrong half the time.
+ * Das aus dem geladenen Bild zu entscheiden erspart dem Katalog eine
+ * zusätzliche Einstellung, die die Hälfte der Zeit falsch wäre.
  */
 export const KACHEL_SCHWELLE_PX = 600;
 

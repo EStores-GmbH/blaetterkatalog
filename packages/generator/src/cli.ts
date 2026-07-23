@@ -1,10 +1,10 @@
 #!/usr/bin/env -S node --experimental-strip-types
 /**
- * katalog-build — turns a PDF into page images, page text, a table of contents
- * and a search index.
+ * katalog-build — verwandelt ein PDF in Seitenbilder, Seitentext, ein
+ * Inhaltsverzeichnis und einen Suchindex.
  *
- * Phase 0: everything lands in a local directory. Phase 1 adds the Storyblok
- * upload on top without changing what is produced here.
+ * Phase 0: Alles landet in einem lokalen Verzeichnis. Phase 1 setzt den
+ * Storyblok-Upload obendrauf, ohne zu ändern, was hier erzeugt wird.
  */
 import { access, constants, copyFile } from 'node:fs/promises';
 import { basename, extname, join, resolve } from 'node:path';
@@ -54,8 +54,9 @@ interface Optionen {
 }
 
 /**
- * Backdrops the viewer ships with. Kept here only to reject typos early — the
- * generator stores the string, the viewer decides what it looks like.
+ * Hintergründe, die der Viewer mitbringt. Steht hier nur, um Tippfehler früh
+ * abzuweisen — der Generator speichert die Zeichenkette, der Viewer entscheidet,
+ * wie sie aussieht.
  */
 export const HINTERGRUND_VORLAGEN = ['holz', 'holz-dunkel', 'grau', 'dunkel'] as const;
 
@@ -260,15 +261,15 @@ async function main(): Promise<void> {
   console.log(`  ${geschrieben.suchindexPfad} (${geschrieben.indexGroesseKb} KB)`);
 }
 
-// Only run when invoked directly. Tests import leseArgumente from this file and
-// must not kick off a render.
+// Nur bei direktem Aufruf ausführen. Tests importieren leseArgumente aus dieser
+// Datei und dürfen keinen Render-Lauf auslösen.
 const direktAufgerufen =
   process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (direktAufgerufen) {
   main().catch((fehler: unknown) => {
     const nachricht = fehler instanceof Error ? fehler.message : String(fehler);
-    // A missing system tool is a setup problem, not a crash — no stack trace.
+    // Ein fehlendes Systemwerkzeug ist ein Einrichtungsproblem, kein Absturz — kein Stacktrace.
     console.error(fehler instanceof WerkzeugFehlt ? `\n${nachricht}` : `\nFehler: ${nachricht}`);
     process.exitCode = 1;
   });

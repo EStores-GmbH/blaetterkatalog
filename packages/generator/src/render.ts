@@ -1,21 +1,22 @@
 /**
- * Renders PDF pages to JPEG images via `pdftoppm`.
+ * Rendert PDF-Seiten via `pdftoppm` zu JPEG-Bildern.
  *
- * Two rules govern the output, both from docs/ARCHITECTURE.md:
- *   1. Single pages only — never a two-page spread. An A4 spread at 300 dpi is
- *      4961 px wide and exceeds the Storyblok Image Service ceiling of 4000 px.
- *   2. The longest edge stays at or below that ceiling, so the resolution is
- *      derived from the page size instead of being hard-coded.
+ * Zwei Regeln bestimmen die Ausgabe, beide aus docs/ARCHITECTURE.md:
+ *   1. Nur Einzelseiten — nie eine Doppelseite. Eine A4-Doppelseite bei 300 dpi
+ *      ist 4961 px breit und überschreitet das Limit des Storyblok Image
+ *      Service von 4000 px.
+ *   2. Die längste Kante bleibt auf oder unter diesem Limit, die Auflösung wird
+ *      also aus der Seitengröße abgeleitet statt fest verdrahtet.
  */
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fuehreAus } from './pdf-tools.ts';
 import type { Ausrichtung } from './types.ts';
 
-/** Storyblok Image Service refuses anything larger on either edge. */
+/** Der Storyblok Image Service weist alles Größere auf einer der Kanten ab. */
 export const MAX_KANTE_PX = 4000;
 
-/** Above this the embedded photos of a print PDF stop gaining detail. */
+/** Darüber gewinnen die eingebetteten Fotos eines Druck-PDFs keine Details mehr. */
 export const STANDARD_DPI = 200;
 
 const PT_PRO_ZOLL = 72;
@@ -29,8 +30,8 @@ export interface RenderErgebnis {
 }
 
 /**
- * Highest resolution whose longest edge still fits under the ceiling.
- * Returns the wish unchanged when it already fits.
+ * Höchste Auflösung, deren längste Kante noch unter das Limit passt.
+ * Liefert den Wunschwert unverändert, wenn er bereits passt.
  */
 export function begrenzeDpi(breitePt: number, hoehePt: number, wunschDpi: number): number {
   const laengsteKantePt = Math.max(breitePt, hoehePt);
@@ -54,7 +55,7 @@ export function pixelMasse(breitePt: number, hoehePt: number, dpi: number): {
 
 export interface RenderOptionen {
   dpi?: number;
-  /** JPEG quality 1–100. 85 is the point where artefacts stop being visible. */
+  /** JPEG-Qualität 1–100. Bei 85 hören die Artefakte auf, sichtbar zu sein. */
   qualitaet?: number;
 }
 
@@ -76,7 +77,7 @@ export async function rendereSeiten(
   // wegen falscher Bildanzahl ab oder übernimmt veraltete Seiten.
   await entferneAlteSeiten(zielVerzeichnis);
 
-  // pdftoppm appends "-<n>.jpg" and pads the number to the page count's width.
+  // pdftoppm hängt "-<n>.jpg" an und füllt die Zahl auf die Breite der Seitenzahl auf.
   const praefix = join(zielVerzeichnis, 'seite');
   await fuehreAus('pdftoppm', [
     '-jpeg',
@@ -104,7 +105,7 @@ export async function rendereSeiten(
   };
 }
 
-/** Removes leftover "seite-*.jpg" from an earlier run. Ignores everything else. */
+/** Entfernt übrig gebliebene "seite-*.jpg" aus einem früheren Lauf. Ignoriert alles andere. */
 async function entferneAlteSeiten(verzeichnis: string): Promise<void> {
   const vorhanden = await readdir(verzeichnis).catch(() => [] as string[]);
   await Promise.all(
@@ -114,7 +115,7 @@ async function entferneAlteSeiten(verzeichnis: string): Promise<void> {
   );
 }
 
-/** "seite-9.jpg" must sort before "seite-10.jpg" — plain string sort would not. */
+/** "seite-9.jpg" muss vor "seite-10.jpg" einsortieren — reine String-Sortierung täte das nicht. */
 export function nachSeitennummer(a: string, b: string): number {
   return nummerAus(a) - nummerAus(b);
 }

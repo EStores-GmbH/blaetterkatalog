@@ -1,41 +1,41 @@
 /**
- * Shape of `katalog.json` — the hinge between phase 0 and phase 1.
+ * Struktur von `katalog.json` — das Scharnier zwischen Phase 0 und Phase 1.
  *
- * In phase 0 the standalone viewer reads this file from disk. In phase 1 the
- * very same structure becomes the Storyblok story. Changing it means changing
- * both sides, so treat it as a contract.
+ * In Phase 0 liest der eigenständige Viewer diese Datei von der Platte. In
+ * Phase 1 wird genau dieselbe Struktur zur Storyblok-Story. Sie zu ändern heißt,
+ * beide Seiten zu ändern — also als Vertrag behandeln.
  */
 
-/** Portrait pages can be shown as a two-page spread, landscape ones cannot. */
+/** Hochformat-Seiten lassen sich als Doppelseite zeigen, Querformat-Seiten nicht. */
 export type Ausrichtung = 'hoch' | 'quer';
 
 export interface Seite {
-  /** 1-based, matches the PDF page order. */
+  /** 1-basiert, entspricht der PDF-Seitenreihenfolge. */
   nr: number;
-  /** Path to the rendered image, relative to katalog.json. */
+  /** Pfad zum gerenderten Bild, relativ zu katalog.json. */
   bild: string;
   breite: number;
   hoehe: number;
-  /** Structured markup for the accessible text route and for search engines. */
+  /** Strukturiertes Markup für die barrierefreie Textroute und für Suchmaschinen. */
   text_html: string;
 }
 
 export interface TocEintrag {
   label: string;
-  /** Page number as printed — what the reader sees. */
+  /** Gedruckte Seitenzahl — was der Leser sieht. */
   seite: number;
   /**
-   * 1-based position in the file — where a click has to jump.
+   * 1-basierte Position in der Datei — wohin ein Klick springen muss.
    *
-   * Usually the same as `seite`, but catalogues with unnumbered front matter
-   * shift the two apart. Set by `versetzeToc` in extract.ts.
+   * Meist gleich `seite`, aber Kataloge mit unnummerierten Vorsatzblättern
+   * schieben beide auseinander. Gesetzt von `versetzeToc` in extract.ts.
    */
   index: number;
 }
 
 export interface Quelle {
   datei: string;
-  /** SHA-256 of the source PDF — lets us tell whether a rebuild is needed. */
+  /** SHA-256 des Quell-PDFs — lässt uns erkennen, ob ein Neuaufbau nötig ist. */
   pruefsumme: string;
   seitenformat_pt: { breite: number; hoehe: number };
   gerendert_dpi: number;
@@ -46,17 +46,19 @@ export interface Katalog {
   titel: string;
   seitenzahl: number;
   /**
-   * Derived from the page aspect ratio, not configurable. Two 16:9 pages side
-   * by side would be 32:9 — unusable on any screen. See docs/ARCHITECTURE.md.
+   * Aus dem Seitenverhältnis abgeleitet, nicht konfigurierbar. Zwei 16:9-Seiten
+   * nebeneinander wären 32:9 — auf keinem Bildschirm brauchbar. Siehe
+   * docs/ARCHITECTURE.md.
    */
   ausrichtung: Ausrichtung;
   akzentfarbe: string;
   /**
-   * Backdrop the book sits on. Either a preset name the viewer knows
-   * ("holz", "holz-dunkel", "grau", "dunkel") or a plain hex colour.
+   * Untergrund, auf dem das Buch liegt. Entweder ein dem Viewer bekannter
+   * Vorlagenname ("holz", "holz-dunkel", "grau", "dunkel") oder ein reiner
+   * Hex-Wert.
    *
-   * The generator only stores the value — which presets exist is the viewer's
-   * business, and in phase 1 an editor picks it in Storyblok.
+   * Der Generator speichert nur den Wert — welche Vorlagen es gibt, ist Sache
+   * des Viewers, und in Phase 1 wählt ein Redakteur sie in Storyblok.
    */
   hintergrund: string;
   download_pdf: string;
@@ -66,7 +68,7 @@ export interface Katalog {
   quelle: Quelle;
 }
 
-/** Written separately — it must never travel with the catalog payload. */
+/** Getrennt geschrieben — es darf nie mit der Katalog-Nutzlast mitreisen. */
 export interface SuchindexEintrag {
   seite: number;
   text: string;

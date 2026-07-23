@@ -1,12 +1,12 @@
 /**
- * Phase 0 viewer. Reads katalog.json and drives the vendored flip engine.
+ * Phase-0-Viewer. Liest katalog.json und steuert die fremdbezogene Flip-Engine.
  *
- * Three things the engine does not do, which live here instead:
- *   - keyboard operation and ARIA (the engine registers mouse and touch only)
- *   - lazy loading (we own the page elements in HTML mode, so we own the src)
- *   - single-page enforcement for landscape catalogues
+ * Drei Dinge, die die Engine nicht tut und die stattdessen hier liegen:
+ *   - Tastaturbedienung und ARIA (die Engine registriert nur Maus und Touch)
+ *   - Lazy Loading (im HTML-Modus gehören uns die Seitenelemente, also auch das src)
+ *   - Erzwingen der Einzelseite bei Querformat-Katalogen
  *
- * See packages/flip-engine/HERKUNFT.md, PATCH 3.
+ * Siehe packages/flip-engine/HERKUNFT.md, PATCH 3.
  */
 import { ladeEngine } from './engine.ts';
 import { sichereAkzentfarbe } from './farbe.ts';
@@ -14,7 +14,7 @@ import { HINTERGRUND_NOTNAGEL, bildDarstellung, waehleHintergrund } from './hint
 import type { Katalog } from './katalog-typen.ts';
 import { baueAltText } from './textfassung.ts';
 
-/** Pages either side of the current spread that get their image loaded. */
+/** Seiten beiderseits der aktuellen Doppelseite, deren Bild geladen wird. */
 const VORLADEFENSTER = 2;
 
 interface Elemente {
@@ -27,11 +27,11 @@ interface Elemente {
 }
 
 /**
- * Applies the backdrop.
+ * Wendet den Untergrund an.
  *
- * The image is loaded before it is applied. A missing or broken file therefore
- * leaves the drawn wood in place instead of a blank stage — and says so in the
- * console rather than failing silently.
+ * Das Bild wird geladen, bevor es angewandt wird. Eine fehlende oder kaputte
+ * Datei lässt daher das gezeichnete Holz stehen statt einer leeren Bühne — und
+ * sagt das in der Konsole, statt still zu scheitern.
  */
 async function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined): Promise<void> {
   const wahl = waehleHintergrund(wunsch);
@@ -72,13 +72,14 @@ async function setzeHintergrund(buehne: HTMLElement, wunsch: string | undefined)
 }
 
 /**
- * Builds the clickable table of contents.
+ * Baut das anklickbare Inhaltsverzeichnis.
  *
- * Each entry is a real `<button>`, not a styled `<div>` — that gives keyboard
- * operation, the right screen reader role and focus handling for free.
+ * Jeder Eintrag ist ein echter `<button>`, kein gestyltes `<div>` — das gibt
+ * Tastaturbedienung, die richtige Screenreader-Rolle und Fokusbehandlung
+ * kostenlos.
  *
- * The panel stays hidden entirely when the generator found no contents page.
- * An empty "Inhalt" button that opens onto nothing is worse than no button.
+ * Das Panel bleibt ganz verborgen, wenn der Generator keine Inhaltsseite fand.
+ * Ein leerer "Inhalt"-Knopf, der ins Nichts öffnet, ist schlimmer als kein Knopf.
  */
 function richteInhaltsverzeichnisEin(katalog: Katalog, springeZu: (index: number) => void): void {
   const knopf = document.getElementById('toc-knopf');
@@ -168,23 +169,23 @@ function magAnimation(): boolean {
 }
 
 /**
- * Flip duration in milliseconds.
+ * Blätterdauer in Millisekunden.
  *
- * NOT 0 for reduced motion: the engine rejects `flippingTime <= 0` in its
- * constructor with "Invalid flipping time", which would leave those users —
- * the very ones the setting protects — with no catalogue at all. 1 ms is
- * effectively instant and passes validation.
+ * NICHT 0 bei reduzierter Bewegung: Die Engine weist `flippingTime <= 0` in
+ * ihrem Konstruktor mit "Invalid flipping time" zurück, was genau jene Nutzer —
+ * die, die die Einstellung schützt — ganz ohne Katalog ließe. 1 ms ist
+ * praktisch sofort und besteht die Prüfung.
  */
 function blaetterDauer(): number {
   return magAnimation() ? 700 : 1;
 }
 
 /**
- * Builds one page element per catalogue page.
+ * Baut ein Seitenelement je Katalogseite.
  *
- * The image carries `data-src` rather than `src` — nothing is fetched until
- * the page comes within the preload window. With 46 pages at ~300 KB that is
- * the difference between 300 KB and 14 MB on first paint.
+ * Das Bild trägt `data-src` statt `src` — nichts wird geladen, bis die Seite
+ * ins Vorladefenster gerät. Bei 46 Seiten à ~300 KB ist das der Unterschied
+ * zwischen 300 KB und 14 MB beim ersten Paint.
  */
 function baueSeiten(katalog: Katalog): HTMLElement[] {
   return katalog.seiten.map((seite) => {
@@ -204,7 +205,7 @@ function baueSeiten(katalog: Katalog): HTMLElement[] {
   });
 }
 
-/** Swaps data-src to src for everything inside the window, once. */
+/** Tauscht data-src einmalig gegen src für alles innerhalb des Fensters. */
 function ladeFenster(seiten: HTMLElement[], aktuelleSeite: number): void {
   const von = Math.max(0, aktuelleSeite - VORLADEFENSTER);
   const bis = Math.min(seiten.length - 1, aktuelleSeite + VORLADEFENSTER + 1);
@@ -220,7 +221,7 @@ function ladeFenster(seiten: HTMLElement[], aktuelleSeite: number): void {
 }
 
 function beschreibeStand(seite: number, gesamt: number, doppelseite: boolean): string {
-  // seite is the engine's 0-based index of the left-hand page.
+  // seite ist der 0-basierte Index der linken Seite in der Engine.
   const erste = seite + 1;
   if (!doppelseite || erste === 1 || erste >= gesamt) return `Seite ${erste} von ${gesamt}`;
   return `Seite ${erste}–${Math.min(erste + 1, gesamt)} von ${gesamt}`;
@@ -258,11 +259,12 @@ async function start(): Promise<void> {
   ladeFenster(seiten, 0);
 
   /*
-   * Landscape catalogues must never show a spread. Two 16:9 pages side by side
-   * are 32:9 — a strip no screen can show usefully. The engine has no explicit
-   * "single page only" switch; it decides by comparing the container width
-   * against minWidth * 2. Setting minWidth beyond any real viewport makes that
-   * comparison always choose the single-page layout.
+   * Querformat-Kataloge dürfen nie eine Doppelseite zeigen. Zwei 16:9-Seiten
+   * nebeneinander sind 32:9 — ein Streifen, den kein Bildschirm sinnvoll zeigen
+   * kann. Die Engine hat keinen expliziten "nur Einzelseite"-Schalter; sie
+   * entscheidet durch Vergleich der Containerbreite mit minWidth * 2. Ein
+   * minWidth jenseits jedes realen Viewports lässt diesen Vergleich immer das
+   * Einzelseiten-Layout wählen.
    */
   const quer = katalog.ausrichtung === 'quer';
   const minBreite = quer ? 100_000 : 320;

@@ -1,9 +1,10 @@
 /**
- * Shape of `katalog.json`, from the viewer's side.
+ * Struktur von `katalog.json`, aus Sicht des Viewers.
  *
- * Deliberately a separate declaration from the generator's `types.ts`: in
- * phase 1 the data no longer comes from the generator's file system but from
- * the Storyblok API. The viewer must depend on the shape, not on the producer.
+ * Bewusst eine eigene Deklaration, getrennt von der `types.ts` des Generators:
+ * In Phase 1 stammen die Daten nicht mehr aus dem Dateisystem des Generators,
+ * sondern aus der Storyblok-API. Der Viewer muss von der Struktur abhängen,
+ * nicht vom Erzeuger.
  */
 
 export type Ausrichtung = 'hoch' | 'quer';
@@ -35,7 +36,7 @@ export interface Katalog {
   seitenzahl: number;
   ausrichtung: Ausrichtung;
   akzentfarbe: string;
-  /** Preset name or hex colour. Optional — ältere Kataloge kennen das Feld nicht. */
+  /** Vorlagenname oder Hex-Farbe. Optional — ältere Kataloge kennen das Feld nicht. */
   hintergrund?: string;
   download_pdf: string;
   seiten: Seite[];

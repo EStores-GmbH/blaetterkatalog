@@ -1,15 +1,15 @@
 /**
- * Dev server for the phase 0 viewer. Zero dependencies.
+ * Entwicklungsserver für den Phase-0-Viewer. Ohne Abhängigkeiten.
  *
- * Serves three things:
- *   /                     the flipbook
- *   /text/                the HTML text version — the accessible alternative
- *   /katalog/*            the generator output for the selected catalogue
+ * Liefert drei Dinge aus:
+ *   /                     das Flipbook
+ *   /text/                die HTML-Textfassung — die barrierefreie Alternative
+ *   /katalog/*            die Generator-Ausgabe des gewählten Katalogs
  *
- * TypeScript is stripped on the fly with Node's built-in `stripTypeScriptTypes`
- * and handed to the browser as plain JavaScript. That is what lets us keep the
- * viewer in TypeScript without adding a bundler in phase 0. Astro takes over
- * this job in phase 1.
+ * TypeScript wird zur Laufzeit mit Nodes eingebautem `stripTypeScriptTypes`
+ * entfernt und dem Browser als reines JavaScript übergeben. Das lässt uns den
+ * Viewer in TypeScript halten, ohne in Phase 0 einen Bundler hinzuzufügen. In
+ * Phase 1 übernimmt Astro diese Aufgabe.
  */
 import { createServer } from 'node:http';
 import { readFile, readdir, realpath, stat } from 'node:fs/promises';
@@ -38,20 +38,21 @@ const MIME: Record<string, string> = {
 const VIEWER_WURZEL = resolve(import.meta.dirname, '..');
 
 /**
- * The engine lives in a sibling package. The browser flattens the `../../`
- * in its import specifier against the server root, so it asks for
- * /flip-engine/… — this maps that back to the real directory.
+ * Die Engine liegt in einem Nachbarpaket. Der Browser rechnet das `../../` im
+ * Import-Specifier gegen die Server-Wurzel heraus, fragt also /flip-engine/…
+ * an — das hier bildet das auf das echte Verzeichnis zurück.
  */
 const ENGINE_WURZEL = resolve(VIEWER_WURZEL, '..', 'flip-engine');
 
 /**
- * Resolves a request path inside a root directory, or rejects it.
+ * Löst einen Anfragepfad innerhalb eines Wurzelverzeichnisses auf oder weist ihn ab.
  *
- * Fails closed at every step rather than repairing the input: a decoded `..`
- * segment, a NUL byte or broken percent-encoding all return undefined. Repairing
- * a traversal into a valid in-root path would answer an attack with 200 and hide
- * it. Symlink resolution happens in `sendeDatei` — a link inside the root
- * pointing outside would pass this purely textual check.
+ * Lehnt an jeder Stelle ab, statt die Eingabe zu reparieren: ein dekodiertes
+ * `..`-Segment, ein NUL-Byte oder kaputte Prozentkodierung liefern jeweils
+ * undefined. Eine Traversierung in einen gültigen Pfad innerhalb der Wurzel zu
+ * reparieren würde einen Angriff mit 200 beantworten und ihn verbergen. Die
+ * Symlink-Auflösung passiert in `sendeDatei` — ein Link innerhalb der Wurzel,
+ * der nach außen zeigt, käme durch diese rein textuelle Prüfung.
  */
 export function sichererPfad(wurzel: string, angefragt: string): string | undefined {
   let dekodiert: string;

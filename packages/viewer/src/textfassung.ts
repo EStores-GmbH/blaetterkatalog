@@ -1,12 +1,13 @@
 /**
- * Builds the HTML text version of a catalogue.
+ * Baut die HTML-Textfassung eines Katalogs.
  *
- * This is not a fallback — it is the foundation. Three requirements need the
- * catalogue text as real HTML rather than pixels: BFSG accessibility, Google
- * indexing, and use without a mouse. The flipbook is the surface on top.
+ * Das ist kein Notbehelf — es ist das Fundament. Drei Anforderungen brauchen
+ * den Katalogtext als echtes HTML statt als Pixel: BFSG-Barrierefreiheit,
+ * Google-Indexierung und Nutzung ohne Maus. Das Flipbook ist die Oberfläche
+ * darüber.
  *
- * In phase 1 this moves into Astro as one route per page. The markup produced
- * here is the template for it.
+ * In Phase 1 wandert das nach Astro als eine Route je Seite. Das hier erzeugte
+ * Markup ist die Vorlage dafür.
  */
 import { sichereAkzentfarbe } from './farbe.ts';
 import type { Katalog, Seite } from './katalog-typen.ts';
@@ -20,7 +21,7 @@ const HTML_ERSATZ: Record<string, string> = {
   '"': '&quot;',
 };
 
-/** For values that reach us unescaped — title, chapter labels, image paths. */
+/** Für Werte, die uns unmaskiert erreichen — Titel, Kapitel-Labels, Bildpfade. */
 export function maskiereHtml(text: string): string {
   return text.replace(/[&<>"]/g, (z) => HTML_ERSATZ[z] ?? z);
 }
@@ -28,11 +29,12 @@ export function maskiereHtml(text: string): string {
 const ALT_LAENGE = 110;
 
 /**
- * Removes tags without a regular expression.
+ * Entfernt Tags ohne regulären Ausdruck.
  *
- * `/<[^>]+>/g` degrades to quadratic time on input full of unclosed angle
- * brackets. Page text comes from foreign PDFs, so a linear scan is the safer
- * choice even though our own generator produces the markup.
+ * `/<[^>]+>/g` wird bei Eingabe voller nicht geschlossener spitzer Klammern
+ * quadratisch langsam. Seitentext stammt aus fremden PDFs, ein linearer
+ * Durchlauf ist also die sicherere Wahl, auch wenn unser eigener Generator das
+ * Markup erzeugt.
  */
 function ohneTags(html: string): string {
   let text = '';
@@ -47,7 +49,7 @@ function ohneTags(html: string): string {
   return text;
 }
 
-/** Falls back to the page number when a page carries no text at all. */
+/** Weicht auf die Seitenzahl aus, wenn eine Seite gar keinen Text trägt. */
 export function baueAltText(seite: Seite, gesamt: number): string {
   const worte = ohneTags(seite.text_html).replace(/\s+/g, ' ').trim();
 

@@ -1,16 +1,16 @@
 /**
- * Colour helpers shared inside the viewer.
+ * Farb-Helfer, die innerhalb des Viewers geteilt werden.
  *
- * The hex check and the accent default were duplicated across textfassung.ts
- * (server render) and flipbook.ts (client), and flipbook set the accent from
- * catalogue data without validating it at all. One place now.
+ * Die Hex-Prüfung und der Akzent-Standardwert waren über textfassung.ts
+ * (Server-Render) und flipbook.ts (Client) dupliziert, und flipbook setzte den
+ * Akzent aus den Katalogdaten, ohne ihn überhaupt zu prüfen. Jetzt an einer Stelle.
  */
 
 export const HEX_FARBE = /^#[0-9a-fA-F]{6}$/;
 
 export const STANDARD_AKZENT = '#0057a0';
 
-/** Returns the value if it is a valid hex colour, otherwise the fallback. */
+/** Liefert den Wert, wenn er eine gültige Hex-Farbe ist, sonst den Ersatzwert. */
 export function sichereAkzentfarbe(wert: string | undefined): string {
   return wert && HEX_FARBE.test(wert) ? wert : STANDARD_AKZENT;
 }
