@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit && tsc --noEmit -p packages/flip-engine && tsc --noEmit -p packages/viewer"
   },
   "devDependencies": {
-    "@types/node": "^22.15.0",
+    "@types/node": "^26.2.0",
     "lefthook": "^2.1.10",
     "typescript": "^5.9.0"
   }
