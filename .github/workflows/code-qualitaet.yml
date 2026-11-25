@@ -1,0 +1,44 @@
+# Kostenlose Code-Qualitätsprüfung (Linter). Läuft bei jedem Push und Pull Request.
+# Python wird mit Ruff geprüft, Shell-Skripte mit ShellCheck – jeweils nur, wenn solche Dateien da sind.
+# JS_LINT legt fest, wie JavaScript/TypeScript geprüft wird: biome, npm (eigenes "npm run lint") oder aus.
+name: Code-Qualität
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  JS_LINT: biome
+jobs:
+  linter:
+    name: Linter (Ruff, ShellCheck, Biome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Python prüfen (Ruff)
+        if: always()
+        run: |
+          if git ls-files '*.py' | grep -q .; then
+            pipx run ruff==0.17.6 check .
+          else
+            echo "Kein Python-Code gefunden."
+          fi
+      - name: Shell-Skripte prüfen (ShellCheck)
+        if: always()
+        run: |
+          files=$(git ls-files '*.sh')
+          if [ -n "$files" ]; then
+            shellcheck --severity=warning $files
+          else
+            echo "Keine Shell-Skripte gefunden."
+          fi
+      - name: JavaScript/TypeScript prüfen
+        if: always() && env.JS_LINT != 'aus'
+        run: |
+          if [ "$JS_LINT" = "biome" ]; then
+            npx --yes @biomejs/biome@2.6.9 lint --diagnostic-level=error .
+          else
+            npm ci
+            npm run lint
+          fi
