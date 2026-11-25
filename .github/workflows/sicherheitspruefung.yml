@@ -1,0 +1,48 @@
+# Kostenlose Code- und Sicherheitsprüfung (ersetzt die kostenpflichtigen GitHub-Module)
+# Läuft bei jedem Push und Pull Request, montags automatisch und auf Knopfdruck.
+name: Sicherheitsprüfung
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  passwoerter:
+    name: Passwörter und Schlüssel (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gesamte Git-Historie prüfen
+        run: |
+          docker run --rm -v "$PWD:/repo" trufflesecurity/trufflehog:latest \
+            git file:///repo --results=verified,unknown --fail --no-update
+
+  code:
+    name: Code-Lücken (Semgrep CE)
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Code prüfen
+        run: semgrep scan --config p/default --error --metrics=off
+
+  abhaengigkeiten:
+    name: Lücken in Abhängigkeiten (OSV-Scanner)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abhängigkeiten prüfen
+        run: |
+          code=0
+          docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner:latest scan source -r /src || code=$?
+          # 128 = keine Paketdateien gefunden, das ist kein Fehler
+          if [ "$code" -eq 128 ]; then exit 0; fi
+          exit "$code"
